@@ -61,25 +61,9 @@ StatusType reset_cmd(char ** paramsArray,sudokoBoard *board,MODE mode,int paramN
 StatusType exit_program_cmd(char ** paramsArray,sudokoBoard *board,MODE mode,int paramNum);
 /*releases memory by destroyBoard from solver, destroylist ? . prints exit message.*/
 
-CmdInfo Solve ={&solve_cmd, INIT_MODE+EDIT_MODE+SOLVE_MODE , 1, String,"solve"};
-CmdInfo Edit ={&edit_cmd, INIT_MODE+EDIT_MODE+SOLVE_MODE,1,String+None,"edit"};
-CmdInfo Mark ={&mark_errors_cmd, SOLVE_MODE,1,Integer,"mark_errors"};
-CmdInfo Print ={&print_board_cmd, EDIT_MODE+SOLVE_MODE,0,None,"print_board"};
-CmdInfo Set ={&set_cmd, EDIT_MODE+SOLVE_MODE,3,Integer,"set"};
-CmdInfo Validate ={&validate_cmd, EDIT_MODE+SOLVE_MODE,0, None, "validate"};
-CmdInfo Guess ={&guess_cmd, SOLVE_MODE, 1, Float, "guess"};
-CmdInfo Generate ={&generate_cmd, EDIT_MODE,2,Integer,"generate"};
-CmdInfo Undo ={&undo_cmd, EDIT_MODE+SOLVE_MODE,0,None,"undo"};
-CmdInfo Redo ={&redo_cmd, EDIT_MODE+SOLVE_MODE,0,None,"redo"};
-CmdInfo Save ={&save_cmd, EDIT_MODE+SOLVE_MODE,1,String,"save"};
-CmdInfo Hint ={&hint_cmd, SOLVE_MODE ,2,Integer,"hint"};
-CmdInfo Guess_h ={&guess_h_cmd, SOLVE_MODE,2,Integer,"guess_hint"};
-CmdInfo Num_s ={&num_s_cmd, EDIT_MODE+SOLVE_MODE,0,None,"num_solutions"};
-CmdInfo Autofill ={&autofill_cmd, SOLVE_MODE,0,None,"autofill"};
-CmdInfo Reset ={&reset_cmd, EDIT_MODE+SOLVE_MODE,0,None,"reset"};
-CmdInfo Exit ={&exit_program_cmd, INIT_MODE+EDIT_MODE+SOLVE_MODE,0,None,"exit"};
+extern CmdInfo Solve,Edit,Mark,Print,Set,Validate,Guess,Generate,Undo,Redo,Save,Hint,Guess_h,Num_s,Autofill,Reset,Exit;
 
-CmdInfo  CmdArray[] ={Solve,Edit,Mark,Print,Set,Validate,Guess,Generate,Undo,Redo,Save,Hint,Guess_h,Num_s,Autofill,Reset,Exit};
+extern CmdInfo  CmdArray[];
 int load(char *path);/*case when edit with no params load gets NULL and generates 9*9 board*/
 StatusType set(int x, int y, int value, int rest, sudokoBoard *board);
 int is_game_over(sudokoBoard *board);
