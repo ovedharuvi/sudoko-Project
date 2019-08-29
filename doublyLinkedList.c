@@ -2,30 +2,44 @@
 
 #include "doublyLinkedList.h"
 
-
 struct Node {                                  /*action represented by node */
-    sudokoBoard *board;
+    ACTION* action ;
     struct Node* next;
     struct Node* prev;
-
 };
 
 struct Node* head;                              /*maintaining 3 pointers - last action , first action and current action*/
 struct Node* tail;
 struct Node* currentAction;
 
+void printAction(ACTION *action){
+    printf("Old Value: %d \nNew Value: %d \nCell: [%d][%d] \nCmdType: %d \nInserted By Computer: %d",
+            action->oldValue , action->newValue , action->row , action->column , action->command, action->insertedByComputer);
+}
 
-struct Node* createNode(sudokoBoard *board){
+ACTION* createAction(int oldValue , int newValue, int row, int column, int insertedByComputer , CmdType command){
+    ACTION* action = (ACTION*)malloc(sizeof(ACTION));
+    action->oldValue = oldValue;
+    action->newValue = newValue;
+    action->row = row;
+    action->column= column;
+    action->insertedByComputer = insertedByComputer;
+    action->command = command;
+    return action;
+}
+
+
+struct Node* createNode(int oldValue , int newValue , int row , int column ,int insertedByComputer, CmdType command ){
     struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
-    newNode->board = board;
+    newNode->action = createAction(oldValue , newValue , row , column , insertedByComputer, command);
     newNode->prev = NULL;
     newNode->next = NULL;
     return newNode;
 }
 
 
-void InsertAction (sudokoBoard *board){
-    struct Node* newNode = createNode(board);
+void InsertAction (int oldValue , int newValue, int row , int column , int insertedByComputer , CmdType command) {
+    struct Node* newNode = createNode(oldValue , newValue , row, column, insertedByComputer, command);
     if(head == NULL){                               /*check if this is the first action (new list)*/
         head = newNode;
         tail = newNode;
@@ -42,39 +56,40 @@ void InsertAction (sudokoBoard *board){
     currentAction = newNode;
 }
 
-sudokoBoard* listUndo(){
+ACTION* listUndo(){
     if(currentAction == head){
-        printf("Error : You've reached the first action, can't undo\n");
-        return 0;
+        return NULL;
     }
     currentAction = currentAction->prev;
-    return currentAction->board;
+    return currentAction->next->action;
 }
 
-sudokoBoard* listRedo(){
+ACTION* listRedo(){
     if(currentAction == tail){
-        printf("Error : You've reached the last action, can't redo\n");
-        return 0;
+        return NULL;
     }
     currentAction = currentAction->next;
-    return  currentAction->board;
+    return  currentAction->prev->action;
 }
 
-void printLastToFirst(int whatToPrint){
+void printLastToFirst(){
     struct Node* temp = tail;
     if(head == NULL){
-        printf("Error : Nothing to print, list is empty\n");
+        return;
     }
     while(temp != head){
-        printBoard(whatToPrint , temp->board);
+        printAction(temp->action);
+        temp = temp->prev;
     }
 }
-void printFirstToCurrentAction(int whatToPrint){
+
+void printFirstToCurrentAction(){
     struct Node* temp = head;
     if(head == NULL){
-        printf("Error : Nothing to print, list is empty\n");
+        return;
     }
     while(temp != currentAction){
-        printBoard(whatToPrint , temp->board);
+        printAction(temp->action);
+        temp = temp->next;
     }
 }
