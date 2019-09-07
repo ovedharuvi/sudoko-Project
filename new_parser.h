@@ -4,8 +4,6 @@
 
 #ifndef SUDOKOPROJECT_NEW_PARSER_H
 #define SUDOKOPROJECT_NEW_PARSER_H
-
-#endif //SUDOKOPROJECT_NEW_PARSER_H
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
@@ -22,3 +20,5 @@ typedef enum{line_limit = 1, invalid_cmd = 2, invalid_mode = 3, invalid_param_nu
 
 void welcome();
 StatusType order(sudokoBoard **board, MODE mode);/* returns TRUE if the game is solved  successfully, FALSE otherwise, EXIT to finish the program*/
+
+#endif //SUDOKOPROJECT_NEW_PARSER_H

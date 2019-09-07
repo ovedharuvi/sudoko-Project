@@ -37,6 +37,7 @@ void copyCell(cell *copyTo , cell *copyFrom){
     copyTo->numOfPotentialValues = copyFrom->numOfPotentialValues;
     copyTo->solution_value = copyFrom->solution_value;
     copyTo->value = copyFrom->value;
+    copyTo->is_erroneus = copyFrom->is_erroneus;
     for(i=0 ; i< copyFrom->numOfPotentialValues ; ++i){
         potentialValues[i] = copyFrom->potentialValues[i];
     }
@@ -155,6 +156,18 @@ int checkIfValid_BLOCK(sudokoBoard *board , int value , int row , int column){
 int checkIfValid(sudokoBoard *board , int value ,int  row ,int column){
     if(checkIfValid_BLOCK(board , value , row , column) && checkIfValid_COLUMN(board , value , row , column)  && checkIfValid_ROW(board , value , row , column))
         return TRUE;
+    return FALSE;
+}
+
+int isErroneus(sudokoBoard * board){
+    int i , j;
+    for(i = 0 ; i < board->boardSize ; ++i){
+        for(j = 0 ; j < board->boardSize ; ++j){
+            if(board->board[i][j].is_erroneus == 1){
+                return TRUE;
+            }
+        }
+    }
     return FALSE;
 }
 

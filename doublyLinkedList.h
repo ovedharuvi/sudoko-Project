@@ -31,4 +31,6 @@ void printLastToFirst();
 
 /*print the data from the first action made to current action (action history)*/
 void printFirstToCurrentAction();
+
+void destroyList();
 #endif //SUDOKOPROJECT_DOUBLYLINKEDLIST_H

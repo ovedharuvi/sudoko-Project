@@ -26,5 +26,5 @@ void printBoard(int whatToPrint , sudokoBoard* sudokoBoard);            /*what t
  *                                                                        what to print = 1 --> print cell solution value*/
 
 int checkIfValid(sudokoBoard *board , int value ,int  row ,int column);
-
+int isErroneus(sudokoBoard * board);
 #endif //SUDOKOPROJECT_BOARD_H

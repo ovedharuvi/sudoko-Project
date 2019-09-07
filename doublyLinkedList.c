@@ -93,3 +93,20 @@ void printFirstToCurrentAction(){
         temp = temp->next;
     }
 }
+
+void destroyList(){
+    struct Node* temp = tail;
+    if(temp == NULL){
+        return;
+    }
+    while(temp != head){
+        temp = temp->prev;
+        free(temp->next->action);
+        free(temp->next);
+    }
+    free(temp->action);
+    free(temp);
+    free(head);
+    free(tail);
+    free(currentAction);
+}

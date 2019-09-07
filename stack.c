@@ -7,13 +7,12 @@
 
 
 
-Iteration *createStackNode(int row , int column , int direction ){
+Iteration *createStackNode(int row, int column) {
     Iteration* newSolveItaration = (Iteration*)malloc(sizeof(Iteration));
     if(newSolveItaration == NULL)
         return ERROR_MEMORY_DIDNOT_ALLOCATED;
     newSolveItaration->row = row;
     newSolveItaration->column = column;
-    newSolveItaration->direction = direction;
     newSolveItaration->next = NULL;
     return newSolveItaration;
 }
@@ -26,8 +25,8 @@ stack* createStack(){
 }
 
 
-void Push(stack *stack, int row, int column, int direction) {
-    Iteration* newSolveIteration = createStackNode(row, column, direction);
+void Push(stack *stack, int row, int column) {
+    Iteration* newSolveIteration = createStackNode(row, column);
     if(stack->top == NULL){
         stack->top = newSolveIteration;
         return;
@@ -44,9 +43,6 @@ Iteration* top(stack* stack){
         printf("Error : stack is empty.\n");
         return NULL;
     }
-    else{
-        stack->top = stack->top->next;
-    }
     return temp;
 }
 
@@ -61,4 +57,10 @@ void Pop(stack *stack) {
     }
 }
 
+void destroyStack(stack *stack){
+    while(top(stack) != NULL){
+        Pop(stack);
+    }
+    free(stack);
+}
 

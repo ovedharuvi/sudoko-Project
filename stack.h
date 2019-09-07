@@ -6,7 +6,6 @@
 struct stackNode {
     int row;
     int column;
-    int direction;
     struct stackNode* next;
 } ;
 
@@ -17,7 +16,8 @@ typedef struct{
 } stack;
 
 stack*  createStack();
-void Push(stack *stack, int row, int column, int direction);
+void Push(stack *stack, int row, int column);
 Iteration *top(stack* stack);
 void Pop(stack *stack);
+void destroyStack(stack *stack);
 #endif //SUDOKOPROJECT_STACK_H

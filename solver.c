@@ -31,6 +31,18 @@ void chooseRandFixedCells(sudokoBoard *board, int numOfFixedCells);
 
 void allValuesToSolutionValues(sudokoBoard *board);
 
+void firstDynamicCellRowAndColumn(sudokoBoard *board, int *pFirstDynamicCellColumn, int *pFirstDynamicCellRow);
+
+void lastDynamicRowAndColumn(sudokoBoard *board, int *pLastDynamicCellColumn, int *pLastDynamicCellRow);
+
+void nextCellRowAndColumn(sudokoBoard *board, int *pNextColumn, int *pNextRow, int currentRow,
+                          int currentColumn);
+
+void prevCellRowAndColumn(sudokoBoard *board, int *pPrevColumn, int *pPrevRow, int currentRow,
+                          int currentColumn);
+
+int findNextValue(sudokoBoard *board, int row, int column);
+
 int generate(sudokoBoard *board, int numOfLegalValues, int numOfEmptyCells) {
     int try;
     if (isEmptySmallerThenLegalVal(board, numOfLegalValues))
@@ -52,7 +64,7 @@ int validate(sudokoBoard *board) {
     }
 }
 
-int guess(sudokoBoard *board, int threshold) {
+int guess(sudokoBoard *board, float threshold) {
     if (isErroneus(board)) {
         return BOARD_IS_ERRONEUS_ERROR;
     } else {
@@ -77,55 +89,135 @@ int guessHint(sudokoBoard *board, int row, int column) {
 
 int numOfSolutions(sudokoBoard *board) {
     Iteration *currentIteration;
-    int currentRow, currentColumn, currentDirection ,
-        firstDynamicCellRow , firstDynamicCellColumn,
-        lastDynamicRow, lastDynamicColumn,
-        boardSize , heightOfBlock , widthOfBlock,
-        nextRow, nextColumn , prevRow , prevColumn;
-    stack *itarationStack;
-    sudokoBoard *workingBoard , *currentBoard;
-    cell currentCell;
-    boardSize = board->boardSize;
-    heightOfBlock = board->heightOfBlock;
-    widthOfBlock = board->widthOfBlock;
+    int numOfSol;
+    int currentRow, currentColumn,
+            firstDynamicCellRow, firstDynamicCellColumn,
+            lastDynamicRow, lastDynamicColumn,
+            nextRow, nextColumn, prevRow, prevColumn;
+    stack *iterationStack;
+    sudokoBoard *workingBoard;
     workingBoard = copyBoard(board);
-    itarationStack = createStack();
-    firstDynamicCellRowAndColumn(&firstDynamicCellRow , &firstDynamicCellColumn);
-    lastDynamicRowAndColumn(&lastDynamicRow , &lastDynamicColumn);
+    iterationStack = createStack();
+    numOfSol = 0;
+    firstDynamicCellRowAndColumn(workingBoard, &firstDynamicCellColumn, &firstDynamicCellRow);
+    lastDynamicRowAndColumn(workingBoard, &lastDynamicColumn, &lastDynamicRow);
     if (isErroneus(workingBoard)) {
         return BOARD_IS_ERRONEUS_ERROR;
     }
-    Push(itarationStack , 0 , 0 , FORWARD);
+    Push(iterationStack, 0, 0);
     while (1) {
-        currentIteration = top(itarationStack);
+        currentIteration = top(iterationStack);
         currentRow = currentIteration->row;
         currentColumn = currentIteration->column;
-        currentDirection = currentIteration->direction;
-        currentCell = workingBoard->board[currentRow][currentColumn];
-        nextCellRowAndColumn(&nextRow , &nextColumn);
-        prevCellRowAndColumn(&prevRow , &prevColumn);
-        if(currentDirection == FORWARD){
-            if(!findValue(board , currentRow , currentColumn)){
-                Push(itarationStack, prevRow, prevColumn, BACKWARD);
+        nextCellRowAndColumn(workingBoard, &nextColumn, &nextRow, 0, 0);
+        prevCellRowAndColumn(workingBoard, &prevColumn, &prevRow, 0, 0);
+        if (findNextValue(workingBoard, currentRow, currentColumn)) {
+            if (currentRow == lastDynamicRow && currentColumn == lastDynamicColumn) {
+                numOfSol++;
+                Pop(iterationStack);
+            } else {
+                Push(iterationStack, nextRow, nextColumn);
             }
-            else{
-
+        } else {
+            if (currentRow == firstDynamicCellRow && currentColumn == lastDynamicColumn) {
+                break;
+            } else {
+                Pop(iterationStack);
             }
         }
-
-
-
-
-
-
-            break;
     }
+    destroyStack(iterationStack);
+    destroyBoard(workingBoard);
+    return numOfSol;
+}
 
+int findNextValue(sudokoBoard *board, int row, int column) {
+    cell *currentCell = &(board->board[row][column]);
+    while (1) {
+        if (currentCell->value >= board->boardSize) {
+            currentCell->value = 0;
+            return 0;
+        }
+        currentCell->value++;
+        if (checkIfValid(board, currentCell->value, row, column)) {
+            return 1;
+        }
+    }
+}
+
+void prevCellRowAndColumn(sudokoBoard *board, int *pPrevColumn, int *pPrevRow, const int currentRow,
+                          const int currentColumn) {
+    int tRow, tColumn;
+    if (currentColumn == 0) {
+        tRow = currentRow - 1;
+        tColumn = board->boardSize - 1;
+    } else {
+        tRow = currentRow;
+        tColumn = currentColumn - 1;
+    }
+    while (1) {
+        if (board->board[tRow][tColumn].is_fixed == 0) {
+            *pPrevRow = tRow;
+            *pPrevColumn = tColumn;
+            return;
+        }
+        if (currentColumn == 0) {
+            tRow--;
+            tColumn = board->boardSize - 1;
+        } else {
+            tColumn--;
+        }
+        if (tRow == 0 && tColumn == 0) {
+            return;
+        }
+    }
+}
+
+void nextCellRowAndColumn(sudokoBoard *board, int *pNextColumn, int *pNextRow, const int currentRow,
+                          const int currentColumn) {
+    int tRow, tColumn;
+    if (currentColumn == board->boardSize - 1) {
+        tRow = currentRow + 1;
+        tColumn = 0;
+    } else {
+        tRow = currentRow;
+        tColumn = currentColumn + 1;
+    }
+    while (1) {
+        if (board->board[tRow][tColumn].is_fixed == 0) {
+            *pNextRow = tRow;
+            *pNextColumn = tColumn;
+            return;
+        }
+        if (currentColumn == board->boardSize - 1) {
+            tRow++;
+            tColumn = 0;
+        } else {
+            tColumn++;
+        }
+        if (tRow == board->boardSize - 1 && tColumn == board->boardSize - 1) {
+            return;
+        }
+    }
+}
+
+void lastDynamicRowAndColumn(sudokoBoard *board, int *pLastDynamicCellColumn, int *pLastDynamicCellRow) {
+    int tRow, tColumn;
+    tRow = board->boardSize-1;
+    tColumn = board->boardSize;
+    prevCellRowAndColumn(board , pLastDynamicCellRow , pLastDynamicCellColumn , tRow , tColumn);
+}
+
+void firstDynamicCellRowAndColumn(sudokoBoard *board, int *pFirstDynamicCellColumn, int *pFirstDynamicCellRow) {
+    int tRow , tColumn;
+    tRow = 0;
+    tColumn = -1;
+    nextCellRowAndColumn(board , pFirstDynamicCellRow , pFirstDynamicCellColumn , tRow , tColumn);
 }
 
 
 int generator(sudokoBoard *board, int numOfLegalValues, int numOfFixedCells) {
-    int status = 1;
+    int status;
     status = fillRandomCells(board, numOfLegalValues);
     if (status == 0) {
         return FALSE;
@@ -139,15 +231,12 @@ int generator(sudokoBoard *board, int numOfLegalValues, int numOfFixedCells) {
 }
 
 int isEmptySmallerThenLegalVal(sudokoBoard *board, int numOfLegalValues) {
-    int i, j, potentialCells, v;
-    potentialCells++;
+    int i, j, potentialCells;
+    potentialCells = 0;
     for (i = 0; i < board->boardSize; ++i) {
         for (j = 0; j < board->boardSize; ++j) {
-            for (v = 1; v <= board->boardSize; ++v) {
-                if (checkIfValid(board, v, i, j)) {
-                    potentialCells++;
-                    break;
-                }
+            if(board->board[i][j].value == 0){
+                potentialCells++;
             }
         }
     }
