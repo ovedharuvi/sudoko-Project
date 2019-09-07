@@ -4,24 +4,30 @@
 
 #include "game.h"
 
-ACTION* maintain_list(CmdType cmdType, char ** paramsArray, sudokoBoard *board,sudokoBoard *copy, ACTION* action);
+void
+maintain_list(CmdType cmdType, sudokoBoard *board, sudokoBoard *copy, int oldValue, int newValue, int row, int column);
 
 void compare_board(sudokoBoard *board, sudokoBoard *copy);
 
-ACTION* maintain_list(CmdType cmdType, char **paramsArray, sudokoBoard *board, sudokoBoard *copy, ACTION* action) {
+void maintain_list(CmdType cmdType, sudokoBoard *board, sudokoBoard *copy, int oldValue, int newValue, int row,
+                   int column) {
     switch (cmdType){
-        case (EDIT): destroyList(action); break;///////Oved
-        case (SOLVE):
-        case (SET): InsertAction(paramsArray,0,cmdType);break;
-        case (AUTOFILL || GENERATE || GUESS): compare_board(board,copy);break;
-
+        case (EDIT):  destroyList(); break;///////Oved
+        case (SOLVE): destroyList(); break;
+        case (SET): InsertAction(oldValue,newValue,row,column,0,cmdType);break;
+        case (AUTOFILL): make_equal_board(board,copy);break;
+        case(GENERATE): make_equal_board(board,copy);break;
+        case (GUESS):make_equal_board(board,copy);break;
+        default:break;
 
     }
-    return FALSE;
+    return TRUE;
 }
 
-void compare_board(sudokoBoard *board, sudokoBoard *copy) {
-
+void make_equal_board(sudokoBoard *board, sudokoBoard *copy) {
+    int n,m;
+    n = board->boardSize;
+    /////////////////////////////continue here
 }
 
 sudokoBoard * load(char *path) {
