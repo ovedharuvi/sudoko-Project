@@ -1,8 +1,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "board.h"
 #include "stack.h"
+#include "LP.h"
 #ifndef SUDOKOPROJECT_SOLVER_H
 #define SUDOKOPROJECT_SOLVER_H
 int generate(sudokoBoard *board , int numOfLegalValues , int numOfEmptyCells);

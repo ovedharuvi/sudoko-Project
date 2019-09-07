@@ -5,49 +5,58 @@
 #include <stdio.h>
 
 
-Iteration* top;
 
-Iteration *createSolveItaration(int row , int column , int direction , cell **board){
+
+Iteration *createStackNode(int row , int column , int direction ){
     Iteration* newSolveItaration = (Iteration*)malloc(sizeof(Iteration));
+    if(newSolveItaration == NULL)
+        return ERROR_MEMORY_DIDNOT_ALLOCATED;
     newSolveItaration->row = row;
     newSolveItaration->column = column;
     newSolveItaration->direction = direction;
-    newSolveItaration->board = board;
     newSolveItaration->next = NULL;
     return newSolveItaration;
 }
+stack* createStack(){
+    stack* newStack = (stack*)malloc(sizeof(stack));
+    if(newStack == NULL)
+        return ERROR_MEMORY_DID_NOT_ALLOCATED;
+    newStack->top = NULL;
+    return newStack;
+}
 
-void Push(int row , int column , int direction , cell** board){
-    Iteration* newSolveItaration = createSolveItaration(row , column , direction , board);
-    if(top == NULL){
-        top = newSolveItaration;
+
+void Push(stack *stack, int row, int column, int direction) {
+    Iteration* newSolveIteration = createStackNode(row, column, direction);
+    if(stack->top == NULL){
+        stack->top = newSolveIteration;
         return;
     }
     else{
-        newSolveItaration->next = top;
-        top = newSolveItaration;
+        newSolveIteration->next = stack->top;
+        stack->top = newSolveIteration;
     }
 }
 
-Iteration* Top(){
-    Iteration* temp = top;
-    if(top == NULL){
+Iteration* top(stack* stack){
+    Iteration* temp = stack->top;
+    if(stack->top == NULL){
         printf("Error : stack is empty.\n");
         return NULL;
     }
     else{
-        top = top->next;
+        stack->top = stack->top->next;
     }
     return temp;
 }
 
-void Pop(){
-    Iteration* temp = top;
-    if(top == NULL){
+void Pop(stack *stack) {
+    Iteration* temp = stack->top;
+    if(stack->top == NULL){
         printf("Error : stack is empty , can't Pop.\n");
     }
     else{
-        top = top->next;
+        stack->top = stack->top->next;
         free(temp);
     }
 }

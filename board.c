@@ -6,6 +6,15 @@
 #define BLANK_SPACE "  "
 #define CELL_SPACE 4
 #define FIXED 0
+typedef enum{
+    EXIT = -1, FALSE = 0, TRUE = 1
+}StatusType;
+
+int checkIfValid_ROW(sudokoBoard *board , int value , int row, int column);
+int checkIfValid_COLUMN(sudokoBoard *board , int value ,int row, int column);
+int checkIfValid_BLOCK(sudokoBoard *board , int value , int row , int column);
+
+
 sudokoBoard *createBoard(int heightOfBlock , int widthOfBlock , int markErrors){
     sudokoBoard *board = (sudokoBoard*)malloc(sizeof(sudokoBoard)) ;
     int i;
@@ -102,6 +111,51 @@ void printBoard(int whatToPrint , sudokoBoard* sudokoBoard){
             print_dashes(sudokoBoard);
         }
 
+}
+
+
+int checkIfValid_ROW(sudokoBoard *board , int value , int row, int column){
+    int i;
+    for(i=0 ; i<board->boardSize ; ++i){
+        if(value == board->board[row][i].value &&  i != column){
+            return FALSE;
+        }
+    }
+    return TRUE;
+}
+
+
+int checkIfValid_COLUMN(sudokoBoard *board , int value ,int row, int column){
+    int i;
+    for(i=0 ; i<board->boardSize ; ++i){
+        if(value == board->board[i][column].value && i!= row){
+            return FALSE;
+        }
+    }
+    return TRUE;
+}
+
+
+int checkIfValid_BLOCK(sudokoBoard *board , int value , int row , int column){
+    int upperRow , leftColumn , i , j;
+    upperRow = row/board->heightOfBlock;
+    upperRow *= board->heightOfBlock;
+    leftColumn = column/board->widthOfBlock;
+    leftColumn*= board->widthOfBlock;
+    for(i=upperRow ; i < upperRow+board->heightOfBlock ; ++i){
+        for(j=leftColumn ; j < leftColumn + board->widthOfBlock ; ++j){
+            if(value == board->board[i][j].value && (i != row || j != column)){
+                return FALSE;
+            }
+        }
+    }
+    return TRUE;
+}
+
+int checkIfValid(sudokoBoard *board , int value ,int  row ,int column){
+    if(checkIfValid_BLOCK(board , value , row , column) && checkIfValid_COLUMN(board , value , row , column)  && checkIfValid_ROW(board , value , row , column))
+        return TRUE;
+    return FALSE;
 }
 
 
