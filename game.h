@@ -5,35 +5,14 @@
 #ifndef SUDOKOPROJECT_GAME_H
 #define SUDOKOPROJECT_GAME_H
 
-#include "board.h"
+
 #include "solver.h"
 #include "doublyLinkedList.h"
 
 #endif //SUDOKOPROJECT_GAME_H
 
 #define DEFUALT_SIZE 3
-typedef enum {
-    SOLVE = 0,EDIT = 1,MARK = 2, PRINT = 3, SET = 4, VALIDATE = 5, GUESS = 6, GENERATE = 7, UNDO = 8,
-    REDO = 9, SAVE = 10, HINT = 11, GUESS_H = 12, NUM_S = 13, AUTOFILL = 14, RESET = 15, EXIT_GAME = 16, INVALID =17
-}CmdType;
 
-
-typedef enum{
-    INIT_MODE = 1,EDIT_MODE = 2,SOLVE_MODE = 3
-}MODE;
-typedef enum{
-    EXIT = -1, FALSE = 0, TRUE = 1
-}StatusType;
-typedef enum{
-    String = 1, Integer = 2, Float = 3, None = 4
-}ParamType;
-typedef struct{
-    StatusType (*fun_ptr)(char **paramsArray, sudokoBoard *board, MODE *p_mode, int paramNum);
-    MODE mode;
-    int paramNum;
-    ParamType paramType;
-    char * cmdName;
-}CmdInfo;
 ///////////needs to take care of old value
 StatusType solve_cmd(char ** paramsArray,sudokoBoard *board,MODE *p_mode,int paramNum);/*loads the board x and changes the MODE to SOLVE_MODE*/
 StatusType edit_cmd(char ** paramsArray,sudokoBoard *board,MODE *p_mode,int paramNum);
@@ -87,7 +66,7 @@ CmdInfo  CmdArray[] ={Solve,Edit,Mark,Print,Set,Validate,Guess,Generate,Undo,Red
 
 sudokoBoard * load(char *path);/*case when edit with no params load gets NULL and generates 9*9 board*/
 StatusType set(int x, int y, int value, int rest, sudokoBoard *board);
-int is_game_over(sudokoBoard *board);
+StatusType is_game_over(sudokoBoard *board_ptr);
 insert_to_list(CmdType cmdType, char ** paramsArray, int isComputer);/*function that maintains the doubly linked list
  * inside, set,guess,generate,autofill*/
 void exit_program();
