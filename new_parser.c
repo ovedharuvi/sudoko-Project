@@ -8,7 +8,7 @@ StatusType get_line(char **pString);
 StatusType error_message(ErrorType errorType, CmdInfo cmdInfo);
 StatusType check_param_num(int cmd_index, int num_params_given, CmdInfo *cmdArray);
 StatusType check_valid_params(char *paramArray[], CmdInfo cmdInfo);
-StatusType do_order(CmdInfo cmdInfo, MODE mode, int paramNum, char *paramsArray[], sudokoBoard *p_board);
+StatusType do_order(CmdInfo cmdInfo, MODE *p_mode, int paramNum, char *paramsArray[], sudokoBoard *p_board);
 StatusType get_cmd(char **text, CmdInfo *cmdArray);
 StatusType get_mode(int index, MODE Mode);
 int get_params(char **text, char **paramsArray);
@@ -61,8 +61,8 @@ StatusType get_line(char **pString){/*returns FALSE the user entered more than 2
 
     while ( ( c = getchar() ) != EOF){
         if(i == BUFFERSIZE){
-            return error_line_limit();
-        }else if(c == '\n'){
+            return error_line_limit();////////////////////////////////////////////////
+        }else if(c == '\n'){/*command ends with enter from stdin*/
             return TRUE;
         }else{
             *pString[i]=(char)c;
@@ -72,6 +72,7 @@ StatusType get_line(char **pString){/*returns FALSE the user entered more than 2
     if(c == EOF){
         return EXIT;
     }
+    return TRUE;
 }
 
 
@@ -95,38 +96,6 @@ StatusType get_mode(int index, MODE Mode) {
     return (int) CmdArray[index].mode == (int) Mode ? TRUE : FALSE;
 }
 
-StatusType error_message(ErrorType errorType, CmdInfo cmdInfo) {
-    char str[TEXT_SIZE];
-    char * ptoken = str;
-    switch(errorType){
-        case line_limit : printf("Error.You have entered over 256 characters.");break;
-        case invalid_cmd : printf("Error. Invalid Command.");break;
-        case invalid_mode :
-            switch (cmdInfo.mode){
-                case SOLVE_MODE: ptoken = "solve mode";break;
-                case EDIT_MODE: ptoken = "edit mode"; break;
-                case INIT_MODE: break;
-                default: ptoken = "edit and solve modes";
-            }
-
-            printf("Error.Invalid MODE for This Command. The Command %s is available on %s only.",cmdInfo.cmdName,ptoken);
-            break;
-        case invalid_param_num : printf("Error.Invalid Numbers of Parameters for This Command.The Command %s needs %d Parameters."
-                ,cmdInfo.cmdName,cmdInfo.paramNum);break;
-        case invalid_param_type :
-            switch (cmdInfo.paramType){
-                case Integer: ptoken = "Integer"; break;
-                case String: ptoken = "String"; break;
-                case Float: ptoken = "Float"; break;
-                case None: break;
-            }
-
-            printf("Error.Invalid Type of Parameters for This Command.The Command %s needs Parameters in Type of %s."
-                    ,cmdInfo.cmdName,ptoken);break;
-    }
-
-    return FALSE;
-}
 
 int get_params(char **text, char **paramsArray) {
     char delimit[] = " \t\r\n\v\f";
@@ -142,17 +111,19 @@ int get_params(char **text, char **paramsArray) {
     return result;
     }
 
-StatusType do_order(CmdInfo cmdInfo, MODE mode, int paramNum, char **paramsArray, sudokoBoard *p_board) {
-    cmdInfo.fun_ptr(paramsArray,p_board)
-    return FALSE;
+StatusType do_order(CmdInfo cmdInfo, MODE *p_mode, int paramNum, char **paramsArray, sudokoBoard *p_board) {
+    StatusType status;
+    status = cmdInfo.fun_ptr(paramsArray,p_board,p_mode,paramNum);
+
+    return status;
 }
 
-StatusType order(sudokoBoard **board, MODE mode) {
+StatusType order(sudokoBoard **board, MODE *p_mode) {
     char text[BUFFERSIZE] = {0};
     StatusType status;
     int cmd_index,param_num;
-    char paramsArray [MAX_PARAM][BUFFERSIZE] ;
-    status = get_line((char **) &text);
+    char paramsArray [MAX_PARAM][BUFFERSIZE] ={{0}};
+    status = get_line((char **) &text);///////////////////check if &
     if (status!= TRUE){/*makes the flow exit the game or restart the order*/
         return status;
     }
@@ -160,7 +131,7 @@ StatusType order(sudokoBoard **board, MODE mode) {
     if(cmd_index == (int) INVALID){
         return error_message(invalid_cmd,Solve);
     }
-    status = get_mode(cmd_index, mode);/*checks whether this command is valid if cmd is edit or solve */
+    status = get_mode(cmd_index, *p_mode);/*checks whether this command is valid if cmd is edit or solve */
     if (status == FALSE){
         return error_message(invalid_mode,CmdArray[cmd_index]);
     }
@@ -178,10 +149,10 @@ StatusType order(sudokoBoard **board, MODE mode) {
             return error_message(invalid_param_type, CmdArray[cmd_index]);
         }
     }
-    status = do_order(CmdArray[cmd_index], mode, param_num, (char **) paramsArray, *board);/*checks inner validation inside any function. returns TRUE if gameis over else FALSE*/
+    status = do_order(CmdArray[cmd_index], p_mode, param_num, (char **) paramsArray, *board);/*checks inner validation inside any function. returns TRUE if gameis over else FALSE*/
     if (status == TRUE){
-        print_board();
-        insert
+        print_board_cmd((char **)paramsArray,*board,p_mode,param_num);
+
     }
     return status;
 
