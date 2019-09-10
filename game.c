@@ -126,6 +126,14 @@ StatusType set_cmd(char **paramsArray, sudokoBoard *board, MODE *p_mode, int par
     return status;
 }
 
+StatusType validate_cmd(char **paramsArray, sudokoBoard *board, MODE *p_mode, int paramNum) {
+    int result;
+    result = validate(board);
+    printf(result != 1 ? "The board is unsolvable." : "The board is solvable.");
+    return FALSE;
+}
+
+
 StatusType guess_cmd(char **paramsArray, sudokoBoard *board, MODE *p_mode, int paramNum) {
     sudokoBoard * copy;
     //////////////////////// who sends this error ??
@@ -139,6 +147,15 @@ StatusType guess_cmd(char **paramsArray, sudokoBoard *board, MODE *p_mode, int p
 
     return FALSE;
 }
+
+StatusType generate_cmd(char **paramsArray, sudokoBoard *board, MODE *p_mode, int paramNum) {
+    int x,y;
+    x = atoi(paramsArray[0]);
+    y = atoi(paramsArray[1]);
+
+    return FALSE;
+}
+
 
 StatusType check_range(int row, int column, int value, int size) {
     if (row < 0 || row > size || column < 0 || value < 1 || value > size+1)//////////CHECK IF NEEDS TO HAVE LOWER BOUND
