@@ -65,10 +65,6 @@ CmdInfo Exit ={&exit_program_cmd, INIT_MODE + EDIT_MODE + SOLVE_MODE, 0, None, "
 CmdInfo  CmdArray[] ={Solve,Edit,Mark,Print,Set,Validate,Guess,Generate,Undo,Redo,Save,Hint,Guess_h,Num_s,Autofill,Reset_Game,Exit};
 
 sudokoBoard * load(char *path);/*case when edit with no params load gets NULL and generates 9*9 board*/
-StatusType set(int x, int y, int value, int rest, sudokoBoard *board);
 StatusType is_game_over(sudokoBoard *board_ptr);
-insert_to_list(CmdType cmdType, char ** paramsArray, int isComputer);/*function that maintains the doubly linked list
- * inside, set,guess,generate,autofill*/
 void exit_program();
-StatusType check_cell(cell cell); /*check if a cell is error*/
 StatusType is_erroneous(sudokoBoard * board); /*returns TRUE if a board is erroneous else FALSE*/
