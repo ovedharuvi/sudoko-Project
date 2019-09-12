@@ -21,9 +21,9 @@ sudokoBoard *createBoard(int heightOfBlock , int widthOfBlock , int markErrors){
     cell** tempBoard;
     int boardSize = heightOfBlock*widthOfBlock;
     board->boardSize = boardSize;
-     tempBoard = (cell**)malloc(boardSize* sizeof(cell*));
+    tempBoard = (cell**)malloc(boardSize* sizeof(cell*));
     for(i=0 ; i<boardSize ; ++i)
-       tempBoard[i] = (cell*)malloc(boardSize*sizeof(cell));
+        tempBoard[i] = (cell*)malloc(boardSize*sizeof(cell));
     board->board = tempBoard;
     board->heightOfBlock=heightOfBlock;
     board->widthOfBlock = widthOfBlock;
@@ -73,13 +73,13 @@ void print_dashes(sudokoBoard *board) {
     }
     printf("\n");
 }
-void printCell(int valueToPrint , cell cellToPrint){    /*print 4 digits - space , number(2 digits) , dot asterisk or space according to cell data*/
+void printCell(int valueToPrint, cell cellToPrint, int mark_errors) {    /*print 4 digits - space , number(2 digits) , dot asterisk or space according to cell data*/
     printf(" ");
     (valueToPrint == 0 )? printf(BLANK_SPACE) : printf("%2d" , valueToPrint);
     if(cellToPrint.is_fixed){
         printf(".");                /* 10.*/  /*fixed cell*/
     }
-    else if (cellToPrint.is_erroneus){
+    else if (cellToPrint.is_erroneus && mark_errors == 1){
         printf("*");                /* 10**/  /*erroneus cell*/
     }
     else{
@@ -87,7 +87,7 @@ void printCell(int valueToPrint , cell cellToPrint){    /*print 4 digits - space
     }
 }
 
-void printBoard(int whatToPrint , sudokoBoard* sudokoBoard){
+void printBoard(int whatToPrint, sudokoBoard *sudokoBoard, int mark_errors) {
     int i, j, valueToPrint;
     print_dashes(sudokoBoard);
     for(i=0 ; i< sudokoBoard->boardSize; ++i){
@@ -103,16 +103,17 @@ void printBoard(int whatToPrint , sudokoBoard* sudokoBoard){
                 default:
                     valueToPrint = sudokoBoard->board[i][j].value;
             }
-            printCell(valueToPrint , sudokoBoard->board[i][j]);             /*print 4 digits - space , number(2 digits) , dot asterisk or space according to cell data*/
+            printCell(valueToPrint, sudokoBoard->board[i][j], mark_errors);             /*print 4 digits - space , number(2 digits) , dot asterisk or space according to cell data*/
             if (j % sudokoBoard->widthOfBlock == sudokoBoard->widthOfBlock - 1)
                 printf("|");
         }
         printf("\n");
         if(i % sudokoBoard->heightOfBlock == sudokoBoard->heightOfBlock-1)
             print_dashes(sudokoBoard);
-        }
+    }
 
 }
+
 
 
 int checkIfValid_ROW(sudokoBoard *board , int value , int row, int column){
