@@ -4,20 +4,23 @@
 
 #include "new_parser.h"
 
-StatusType get_line(char **pString);
+StatusType get_line(char *pString);
 StatusType error_message(ErrorType errorType, CmdInfo cmdInfo);
 StatusType check_param_num(int cmd_index, int num_params_given, CmdInfo *cmdArray);
 StatusType check_valid_params(char *paramArray[], CmdInfo cmdInfo);
 StatusType do_order(CmdInfo cmdInfo, MODE *p_mode, int paramNum, char *paramsArray[], sudokoBoard *p_board);
 StatusType get_cmd(char **text, CmdInfo *cmdArray);
 StatusType get_mode(int index, MODE Mode);
-int get_params(char **text, char **paramsArray);
-int error_line_limit();/*prints error_message and returns FALSE*/
+int get_params(char *text, char **paramsArray);
 int str_compare(const char *first, char *second);/*returns 0 if the second string is a prefix of the first string, else 1*/
 
 
 
+
+
+
 void welcome() {
+    SetCmdArray();/* init the CMD Array*/
     printf("Welcome to Sudoku Game ! To initialize new board please enter 'edit'."
            "To load a game please enter 'edit' and then the path of your board.");
 
@@ -28,8 +31,10 @@ StatusType check_valid_params(char *paramArray[], CmdInfo cmdInfo) {
     float f;
     ParamType paramType;
     int param_num = cmdInfo.paramNum;
-    for(i = 0 ; i < param_num ; i++) {
 
+    for(i = 0 ; i < param_num ; i++) {
+        /* %n returns the number of bytes consumed by sscanf, so if cast to int of strlen equal to n
+         * it means that there no bytes left after %d */
         if ((sscanf(paramArray[i], "%d%n", &t, &n)) == 1 && n == (int) strlen(paramArray[i])) {
             paramType = Integer;
 
@@ -55,17 +60,18 @@ StatusType check_param_num(int cmd_index, int num_params_given, CmdInfo *cmdArra
 }
 
 
-StatusType get_line(char **pString){/*returns FALSE the user entered more than 256 characters, TRUE if valid 256 characters, EXIT if exit*/
+StatusType get_line(char *pString){/*returns FALSE if the user entered more than 256 characters, TRUE if valid 256 characters, EXIT if exit by the user*/
     int c = 0, i = 0;
+
     fflush(stdin);
 
     while ( ( c = getchar() ) != EOF){
         if(i == BUFFERSIZE){
-            return error_line_limit();////////////////////////////////////////////////
+            return error_message(line_limit,CmdArray[EDIT]);
         }else if(c == '\n'){/*command ends with enter from stdin*/
             return TRUE;
         }else{
-            *pString[i]=(char)c;
+            pString[i]=(char)c;
             i++;
         }
     }
@@ -81,6 +87,7 @@ StatusType get_cmd(char **text, CmdInfo *cmdArray) {
     char *pcommand;
     char delimit[] = " \t\r\n\v\f";
     pcommand = strtok(*text, delimit);
+    *text = pcommand; /*let text point to the place after the first token by reference*/
 
     for(i = 0 ; i < ORDERS_NUM ; i++){
         if(str_compare(cmdArray[i].cmdName,pcommand) == TRUE){
@@ -88,7 +95,7 @@ StatusType get_cmd(char **text, CmdInfo *cmdArray) {
         }
     }
     return (int) INVALID;
-         }
+}
 
 StatusType get_mode(int index, MODE Mode) {
     /*SOLVE = 0,EDIT = 1,MARK = 2, PRINT = 3, SET = 4, VALIDATE = 5, GUESS = 6, GENERATE = 7, UNDO = 8,
@@ -97,66 +104,73 @@ StatusType get_mode(int index, MODE Mode) {
 }
 
 
-int get_params(char **text, char **paramsArray) {
+int get_params(char *text, char **paramsArray) {
     char delimit[] = " \t\r\n\v\f";
-    int i;
+    int i = 0;
     int result = 0;
     char * ptoken;/*the pointer to be returned by strtok*/
+    while (i < MAX_PARAM) {
 
-    for(i = 0 ; i < MAX_PARAM ; i++){
-        if((ptoken = strtok(*text, delimit))!= NULL)
-            strcpy(paramsArray[i] ,ptoken);
-            result += 1;
+        if (i == 0) {
+            ptoken = strtok(text, delimit);
+        } else {
+            ptoken = strtok(NULL, delimit);
         }
+
+        if(ptoken!= NULL) {
+            strcpy(paramsArray[i], ptoken);
+            result++;
+            i++;
+        }else {
+            break;
+        }
+    }
+
     return result;
     }
 
 StatusType do_order(CmdInfo cmdInfo, MODE *p_mode, int paramNum, char **paramsArray, sudokoBoard *p_board) {
     StatusType status;
-    status = cmdInfo.fun_ptr(paramsArray,p_board,p_mode,paramNum);
 
+    status = cmdInfo.fun_ptr(paramsArray,p_board,p_mode,paramNum);
     return status;
 }
 
-StatusType order(sudokoBoard **board, MODE *p_mode) {
+StatusType order(sudokoBoard **board_ptr, MODE *p_mode) {
     char text[BUFFERSIZE] = {0};
     StatusType status;
     int cmd_index,param_num;
     char paramsArray [MAX_PARAM][BUFFERSIZE] ={{0}};
-    status = get_line((char **) &text);///////////////////check if &
+
+    status = get_line((char *) text);///////////////////check if &
     if (status!= TRUE){/*makes the flow exit the game or restart the order*/
         return status;
     }
     cmd_index = get_cmd((char **) &text, CmdArray);
     if(cmd_index == (int) INVALID){
-        return error_message(invalid_cmd,Solve);
+        return error_message(invalid_cmd,CmdArray[SOLVE]);
     }
     status = get_mode(cmd_index, *p_mode);/*checks whether this command is valid if cmd is edit or solve */
     if (status == FALSE){
         return error_message(invalid_mode,CmdArray[cmd_index]);
     }
-    param_num = get_params((char **) &text,(char **) paramsArray);/*returns num of parameters given (above 3 it's 4)
+    param_num = get_params((char *) text,(char **) paramsArray);/*returns num of parameters given (above 3 it's 4)
  * and put the parameters in the variables*/
     status = check_param_num(cmd_index, param_num, CmdArray);/*checks if the num of parameters given matches the command.
  * if matches - returns TRUE. else returns FALSE */
     if (status == FALSE){
         return error_message(invalid_param_num,CmdArray[cmd_index]);
     }
-    if(param_num!= 0) {
+    if(param_num > 0) {
         status = check_valid_params((char **)paramsArray, CmdArray[cmd_index]);/*checks if the type of parameters given matches the command.
  * if matches - returns TRUE. else returns FALSE and prints error_message message.*/
         if (status == FALSE) {
             return error_message(invalid_param_type, CmdArray[cmd_index]);
         }
     }
-    status = do_order(CmdArray[cmd_index], p_mode, param_num, (char **) paramsArray, *board);/*checks inner validation inside any function. returns TRUE if gameis over else FALSE*/
-    if (status == TRUE){
-        print_board_cmd((char **)paramsArray,*board,p_mode,param_num);
+    status = do_order(CmdArray[cmd_index], p_mode, param_num, (char **) paramsArray, *board_ptr);/*checks inner validation inside any function. returns TRUE if game is over else FALSE*/
 
-    }
     return status;
-
-
 }
 
 
