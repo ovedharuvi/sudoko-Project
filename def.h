@@ -37,5 +37,6 @@ typedef struct{
     char * cmdName;
 }CmdInfo;
 
+extern  CmdInfo  CmdArray[MAX_CMD]; /*={Solve,Edit,Mark,Print,Set,Validate,Guess,Generate,Undo,Redo,Save,Hint,Guess_h,Num_s,Autofill,Reset_Game,Exit};*/
 
 #endif //SUDOKOPROJECT_DEF_H
