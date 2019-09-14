@@ -1,7 +1,8 @@
-
-
 #ifndef SUDOKOPROJECT_BOARD_H
 #define SUDOKOPROJECT_BOARD_H
+
+
+
 typedef struct {
     int is_fixed; /*0 if fixed 1 if not fixed */
     int is_erroneus; /*0 if erroneus 1 if not*/
@@ -22,9 +23,9 @@ typedef struct {
 sudokoBoard *createBoard(int heightOfBlock , int widthOfBlock , int markErrors);
 sudokoBoard *copyBoard(sudokoBoard *board);
 void destroyBoard(sudokoBoard *board);
-void printBoard(int whatToPrint , sudokoBoard* sudokoBoard);            /*what to print = 0 --> print cell value
+void printBoard(int whatToPrint , sudokoBoard* sudokoBoard, int mark_errors);            /*what to print = 0 --> print cell value
  *                                                                        what to print = 1 --> print cell solution value*/
 
-int checkIfValid(sudokoBoard *board , int value ,int  row ,int column);
+int checkIfValid(sudokoBoard *board, int value, int row, int column, int to_mark_error);
 int isErroneus(sudokoBoard * board);
 #endif //SUDOKOPROJECT_BOARD_H
