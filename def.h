@@ -5,17 +5,18 @@
 #ifndef SUDOKOPROJECT_DEF_H
 #define SUDOKOPROJECT_DEF_H
 
-#endif //SUDOKOPROJECT_DEF_H
+
 #include "board.h"
 
 #define BUFFERSIZE 256
 #define MAX_PARAM 4
 #define TEXT_SIZE 25
 #define ORDERS_NUM 17
+#define MAX_BOARD_SIZE 25
 
 typedef enum {
     SOLVE = 0,EDIT = 1,MARK = 2, PRINT = 3, SET = 4, VALIDATE = 5, GUESS = 6, GENERATE = 7, UNDO = 8,
-    REDO = 9, SAVE = 10, HINT = 11, GUESS_H = 12, NUM_S = 13, AUTOFILL = 14, RESET = 15, EXIT_GAME = 16, INVALID =17
+    REDO = 9, SAVE = 10, HINT = 11, GUESS_H = 12, NUM_S = 13, AUTOFILL = 14, RESET = 15, EXIT_GAME = 16, INVALID =17, MAX_CMD=INVALID
 }CmdType;
 
 
@@ -35,3 +36,6 @@ typedef struct{
     ParamType paramType;
     char * cmdName;
 }CmdInfo;
+
+
+#endif //SUDOKOPROJECT_DEF_H
