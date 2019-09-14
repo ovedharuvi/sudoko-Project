@@ -7,7 +7,6 @@
 
 StatusType check_range(int row, int column, int value, int size);
 
-
 void do_set_by_action(ACTION action, sudokoBoard *board, int is_undo);
 
 void maintain_erroneous(int row, int column, int value, sudokoBoard *board);
