@@ -13,7 +13,7 @@
 
 #define DEFUALT_SIZE 3
 
-///////////needs to take care of old value
+
 StatusType solve_cmd(char ** paramsArray,sudokoBoard *board,MODE *p_mode,int paramNum);/*loads the board x and changes the MODE to SOLVE_MODE*/
 StatusType edit_cmd(char ** paramsArray,sudokoBoard *board,MODE *p_mode,int paramNum);
 /*change the MODE to EDIT_MODE. in case of path given loads a board (with mark errors) else creates empty 9*9 board (from board.h) */
@@ -44,26 +44,10 @@ StatusType reset_cmd(char ** paramsArray,sudokoBoard *board,MODE *p_mode,int par
 /*listUndo from doublyLinkedList to the header */
 StatusType exit_program_cmd(char ** paramsArray,sudokoBoard *board,MODE *p_mode,int paramNum);
 /*releases memory by destroyBoard from solver, destroylist ? . prints exit message.*/
-/////////////////////////////////////validate the sum of ENUM
-CmdInfo Solve ={solve_cmd, INIT_MODE + EDIT_MODE + SOLVE_MODE , 1, String, "solve"};
-CmdInfo Edit ={&edit_cmd, INIT_MODE + EDIT_MODE + SOLVE_MODE, 1, String + None, "edit"};
-CmdInfo Mark ={&mark_errors_cmd, SOLVE_MODE, 1, Integer, "mark_errors"};
-CmdInfo Print ={&print_board_cmd, EDIT_MODE + SOLVE_MODE, 0, None, "print_board"};
-CmdInfo Set ={&set_cmd, EDIT_MODE + SOLVE_MODE, 3, Integer, "set"};//calls insert_to_list,is_game_over
-CmdInfo Validate ={&validate_cmd, EDIT_MODE + SOLVE_MODE, 0, None, "validate"};
-CmdInfo Guess ={&guess_cmd, SOLVE_MODE, 1, Float, "guess"};
-CmdInfo Generate ={&generate_cmd, EDIT_MODE, 2, Integer, "generate"};
-CmdInfo Undo ={&undo_cmd, EDIT_MODE + SOLVE_MODE, 0, None, "undo"};
-CmdInfo Redo ={&redo_cmd, EDIT_MODE + SOLVE_MODE, 0, None, "redo"};
-CmdInfo Save ={&save_cmd, EDIT_MODE + SOLVE_MODE, 1, String, "save"};    //in edit mode :validate, all fixed cells
-CmdInfo Hint ={&hint_cmd, SOLVE_MODE , 2, Integer, "hint"};
-CmdInfo Guess_h ={&guess_h_cmd, SOLVE_MODE, 2, Integer, "guess_hint"};
-CmdInfo Num_s ={&num_s_cmd, EDIT_MODE + SOLVE_MODE, 0, None, "num_solutions"};
-CmdInfo Autofill ={&autofill_cmd, SOLVE_MODE, 0, None, "autofill"};
-CmdInfo Reset_Game ={&reset_cmd, EDIT_MODE + SOLVE_MODE, 0, None, "reset"};
-CmdInfo Exit ={&exit_program_cmd, INIT_MODE + EDIT_MODE + SOLVE_MODE, 0, None, "exit"};
-CmdInfo  CmdArray[] ={Solve,Edit,Mark,Print,Set,Validate,Guess,Generate,Undo,Redo,Save,Hint,Guess_h,Num_s,Autofill,Reset_Game,Exit};
 
+
+static CmdInfo  CmdArray[MAX_CMD] ; /*={Solve,Edit,Mark,Print,Set,Validate,Guess,Generate,Undo,Redo,Save,Hint,Guess_h,Num_s,Autofill,Reset_Game,Exit};*/
+void SetCmdArray();
 sudokoBoard * load(char *path);/*case when edit with no params load gets NULL and generates 9*9 board*/
 StatusType is_game_over(sudokoBoard *board_ptr);
 void exit_program();
