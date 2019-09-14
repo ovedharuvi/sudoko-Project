@@ -4,9 +4,10 @@
 
 #include "game.h"
 
-
+/*returns TRUE if the row,column and value in the correct range of the board */
 StatusType check_range(int row, int column, int value, int size);
 
+/* */
 void do_set_by_action(ACTION action, sudokoBoard *board, int is_undo);
 
 void maintain_erroneous(int row, int column, int value, sudokoBoard *board);
@@ -300,6 +301,7 @@ StatusType validate_cmd(char **paramsArray, sudokoBoard *board, MODE *p_mode, in
     (void) p_mode;
 
 
+
     result = validate(board);
     printf(result != SOLVABLE ? "The board is unsolvable." : "The board is solvable.");
     return FALSE;
@@ -311,7 +313,7 @@ StatusType guess_cmd(char **paramsArray, sudokoBoard *board, MODE *p_mode, int p
     float f;
 
     f = atof(paramsArray[0]);
-    ///////////////////
+
     if (f < 0 || f > 1) {
         return error_message(incorrect_range, CmdArray[GUESS]);
     }
@@ -319,7 +321,7 @@ StatusType guess_cmd(char **paramsArray, sudokoBoard *board, MODE *p_mode, int p
     if (is_erroneous(board) == TRUE)
         return error_message(board_errorneus, CmdArray[VALIDATE]);
 
-    guess(board, f);//// board and not int ?
+   copy = guess(board, f);//// board and not int ?
     make_board_equal(board, copy, GUESS);
     print_board_cmd(paramsArray, board, p_mode, paramNum);
 
@@ -329,10 +331,16 @@ StatusType guess_cmd(char **paramsArray, sudokoBoard *board, MODE *p_mode, int p
 
 StatusType generate_cmd(char **paramsArray, sudokoBoard *board, MODE *p_mode, int paramNum) {
     int x, y;
-    ///////////////////////////////////
+    sudokoBoard * copy;
+    StatusType status;
+
     x = atoi(paramsArray[0]);
     y = atoi(paramsArray[1]);
-    generate(board, x, y);
+   status = isEmptySmallerThenLegalVal(board,x);
+   if (status == FALSE){
+       return error_message(incorrect_range,CmdArray[GENERATE]);
+   }
+    copy = generate(board, x, y);
     print_board_cmd(paramsArray, board, p_mode, paramNum);
     return FALSE;
 }
@@ -456,7 +464,7 @@ StatusType guess_h_cmd(char **paramsArray, sudokoBoard *board, MODE *p_mode, int
         return error_message(incorrect_range, CmdArray[GUESS_H]);
     }
 
-    guessHint(board, i, j);////////////////////////////
+    guessHint(board, i, j);
     return FALSE;
 }
 
