@@ -5,17 +5,13 @@
 #include "solver.h"
 #include "LP.h"
 #include "stack.h"
-
+#include "errors.h"
 #define TRIES_FOR_GENERATOR 1000
 #define FORWARD 1
 #define BACKWARD 0
 
-typedef enum {
-    EXIT = -1, FALSE = 0, TRUE = 1
-} StatusType;
 
-
-int generator(sudokoBoard *board, int numOfLegalValues, int numOfFixedCells);
+sudokoBoard * generator(sudokoBoard *board, int numOfLegalValues, int numOfFixedCells);
 
 int calcNumOfPotentialValues(sudokoBoard *board);
 
@@ -73,15 +69,6 @@ int guess(sudokoBoard *board, float threshold) {
 }
 
 int guessHint(sudokoBoard *board, int row, int column) {
-    if (isErroneus(board)) {
-        return BOARD_IS_ERRONEUS_ERROR;
-    }
-    if (board->board[row][column].is_fixed == 1) {
-        return CELL_IS_FIXED_ERROR;
-    }
-    if (board->board[row][column].value != 0) {
-        return CELL_IS_FILLED_ERROR;
-    }
     if (gurobi(board, 0, GUESS_H, row, column) == UNSOLVABLE) {
         return BOARD_IS_UNSOLVABLE_ERROR;
     }
@@ -101,9 +88,6 @@ int numOfSolutions(sudokoBoard *board) {
     numOfSol = 0;
     firstDynamicCellRowAndColumn(workingBoard, &firstDynamicCellColumn, &firstDynamicCellRow);
     lastDynamicRowAndColumn(workingBoard, &lastDynamicColumn, &lastDynamicRow);
-    if (isErroneus(workingBoard)) {
-        return BOARD_IS_ERRONEUS_ERROR;
-    }
     Push(iterationStack, 0, 0);
     while (1) {
         currentIteration = top(iterationStack);
@@ -216,15 +200,15 @@ void firstDynamicCellRowAndColumn(sudokoBoard *board, int *pFirstDynamicCellColu
 }
 
 
-int generator(sudokoBoard *board, int numOfLegalValues, int numOfFixedCells) {
+sudokoBoard * generator(sudokoBoard *board, int numOfLegalValues, int numOfFixedCells) {
     int status;
     status = fillRandomCells(board, numOfLegalValues);
     if (status == 0) {
-        return FALSE;
+        return NULL;
     }
     status = gurobi(board, 0, GENERATE, 0, 0);
     if (status != SOLVABLE) {
-        return FALSE;
+        return NULL;
     }
     solutionValueToValue(board, numOfFixedCells);
     return TRUE;

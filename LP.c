@@ -44,7 +44,7 @@ void fillSolValuesInBoard(sudokoBoard *sudokoBoard, const double *solArray, cons
 /*Random choose index from potentialValuesArray according to their scores----
  * i.e if the value 2 has a score of 0.3 and value 6 has a score of 0.6---
  *        6 has twice the chance to be picked*/
-void randomChooseByWeight(int numOfValues, double *potentialValuesArray, int *pChosenIndex);
+void randomChooseByWeight(int numOfValues, float *potentialValuesArray, int *pChosenIndex);
 
 void freeAllocatedMem(double *objArray, char *vtype, int *mapArray, int *indArray, double *valArray, GRBmodel **pBmodel,
                       GRBenv **pBenv, double *solArray);
@@ -100,7 +100,7 @@ int gurobi(sudokoBoard *sudokoBoard, float threshhold, CmdType command, int gues
             obj[i] = 1;
         } else {
             vtype[i] = GRB_CONTINUOUS;
-            obj[i] = rand() % boardSize;
+            obj[i] = 1;
         }
 
     }
@@ -268,7 +268,7 @@ int actByCommand(sudokoBoard *board, double *solArray, int *mapArray, CmdType co
     }
 
     if (command == GUESS) {
-        double *potentialValues;
+        float *potentialValues;
         i = 0;
         potentialValues = malloc(sizeof(float) * 2 * boardSize);
         if (potentialValues == NULL) {
@@ -320,19 +320,20 @@ int actByCommand(sudokoBoard *board, double *solArray, int *mapArray, CmdType co
     }
 }
 
-void randomChooseByWeight(int numOfValues, double *potentialValuesArray, int *pChosenIndex) {
+void randomChooseByWeight(int numOfValues, float *potentialValuesArray, int *pChosenIndex) {
     int sumOfWeights, randomNumber;
     int i;
+
     for (i = 1, sumOfWeights = 0; i < numOfValues; i += 2) {
-        sumOfWeights += (int) (potentialValuesArray[i] * 100);
+        sumOfWeights += potentialValuesArray[i]*1000;
     }
     randomNumber = rand() % sumOfWeights;
     for (i = 1; i < numOfValues; i += 2) {
-        if (randomNumber < potentialValuesArray[i] * 100) {
+        if (randomNumber < potentialValuesArray[i]*1000) {
             *pChosenIndex = i - 1;
             return;
         }
-        randomNumber -= (int) potentialValuesArray[i] * 100;
+        randomNumber -= potentialValuesArray[i]*1000;
     }
 #ifdef DEBUG
     printf("Error: random choose by weights doesn't work");
