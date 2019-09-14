@@ -46,8 +46,7 @@ StatusType exit_program_cmd(char ** paramsArray,sudokoBoard *board,MODE *p_mode,
 /*releases memory by destroyBoard from solver, destroylist ? . prints exit message.*/
 
 
-
-
+void SetCmdArray();
 sudokoBoard * load(char *path);/*case when edit with no params load gets NULL and generates 9*9 board*/
 StatusType is_game_over(sudokoBoard *board_ptr);
 void exit_program();

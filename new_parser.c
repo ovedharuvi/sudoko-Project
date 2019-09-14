@@ -19,7 +19,7 @@ int str_compare(const char *first, char *second);/*returns 0 if the second strin
 
 
 
-void welcome() {
+void init_game() {
     SetCmdArray();/* init the CMD Array*/
     printf("Welcome to Sudoku Game ! To initialize new board please enter 'edit'."
            "To load a game please enter 'edit' and then the path of your board.");
@@ -127,7 +127,7 @@ int get_params(char *text, char **paramsArray) {
     }
 
     return result;
-    }
+}
 
 StatusType do_order(CmdInfo cmdInfo, MODE *p_mode, int paramNum, char **paramsArray, sudokoBoard *p_board) {
     StatusType status;

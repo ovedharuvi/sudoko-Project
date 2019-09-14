@@ -12,7 +12,7 @@ int main() {
 
     while (prog_stat!=EXIT) {/*program is not over*/
         mode = INIT_MODE;
-        welcome();
+        init_game();
         game_stat = FALSE;
         while (game_stat == FALSE){
             game_stat = order(&p_board,&mode);
