@@ -445,7 +445,6 @@ StatusType hint_cmd(char **paramsArray, sudokoBoard *board, MODE *p_mode, int pa
 }
 
 StatusType guess_h_cmd(char **paramsArray, sudokoBoard *board, MODE *p_mode, int paramNum) {
-    /*ask Oved*/
     int i, j, n;
     StatusType status;
 
@@ -459,7 +458,7 @@ StatusType guess_h_cmd(char **paramsArray, sudokoBoard *board, MODE *p_mode, int
     n = board->boardSize;
     /*check range of params is valid*/
 
-    status = check_range(i, j, 1, n);
+    status = check_range(i, j, i, n);
     if (status == FALSE) {
         return error_message(incorrect_range, CmdArray[GUESS_H]);
     }
@@ -549,7 +548,7 @@ StatusType exit_program_cmd(char **paramsArray, sudokoBoard *board, MODE *p_mode
 
 StatusType check_range(int row, int column, int value, int size) {
     if (row < 0 || row > size || column < 0 || value < 0 ||
-        value > size + 1)//////////CHECK IF NEEDS TO HAVE LOWER BOUND
+        value > size + 1)/*CHECK IF NEEDS TO HAVE LOWER BOUND*/
         return FALSE;
 
     return TRUE;

@@ -50,4 +50,4 @@ void SetCmdArray(); /*initialize Command Array*/
 sudokoBoard * load(char *path);/*case when edit with no params load gets NULL and generates 9*9 board*/
 StatusType is_game_over(sudokoBoard *board_ptr); /*returns TRUE if all board is filled else FALSE*/
 void exit_program();
-StatusType is_erroneous(sudokoBoard * board); /*returns TRUE if a board is erroneous else FALSE*/
+

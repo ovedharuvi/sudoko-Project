@@ -5,7 +5,6 @@
 #include "new_parser.h"
 
 StatusType get_line(char *pString);
-StatusType error_message(ErrorType errorType, CmdInfo cmdInfo);
 StatusType check_param_num(int cmd_index, int num_params_given, CmdInfo *cmdArray);
 StatusType check_valid_params(char *paramArray[], CmdInfo cmdInfo);
 StatusType do_order(CmdInfo cmdInfo, MODE *p_mode, int paramNum, char *paramsArray[], sudokoBoard *p_board);

@@ -10,6 +10,7 @@
 
 
 void init_game();  /*initialize the command array and sends welcome message*/
-StatusType order(sudokoBoard **board_ptr, MODE *p_mode);/* returns TRUE if the game is solved  successfully, FALSE otherwise, EXIT to finish the program
+StatusType order(sudokoBoard **board_ptr, MODE *p_mode);
+/* returns TRUE if the game is solved  successfully, FALSE otherwise, EXIT to finish the program*/
 
 #endif //SUDOKOPROJECT_NEW_PARSER_H
