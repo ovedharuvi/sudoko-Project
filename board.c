@@ -75,11 +75,13 @@ void print_dashes(sudokoBoard *board) {
     }
     printf("\n");
 }
-void printCell(int valueToPrint, cell cellToPrint, int mark_errors) {    /*print 4 digits - space , number(2 digits) , dot asterisk or space according to cell data*/
+void printCell(int valueToPrint, cell cellToPrint, int mark_errors, int mark_fixed) {    /*print 4 digits - space , number(2 digits) , dot asterisk or space according to cell data*/
     printf(" ");
     (valueToPrint == 0 )? printf(BLANK_SPACE) : printf("%2d" , valueToPrint);
-    if(cellToPrint.is_fixed){
-        printf(".");                /* 10.*/  /*fixed cell*/
+    if(mark_fixed == TRUE) {
+        if (cellToPrint.is_fixed) {
+            printf(".");                /* 10.*/  /*fixed cell*/
+        }
     }
     else if (cellToPrint.is_erroneus && mark_errors == TRUE){
         printf("*");                /* 10**/  /*erroneus cell*/
@@ -89,7 +91,7 @@ void printCell(int valueToPrint, cell cellToPrint, int mark_errors) {    /*print
     }
 }
 
-void printBoard(int whatToPrint, sudokoBoard *sudokoBoard, int mark_errors) {
+void printBoard(int whatToPrint, sudokoBoard *sudokoBoard, int mark_errors, int mark_fixed) {
     int i, j, valueToPrint;
     print_dashes(sudokoBoard);
     for(i=0 ; i< sudokoBoard->boardSize; ++i){
@@ -105,7 +107,7 @@ void printBoard(int whatToPrint, sudokoBoard *sudokoBoard, int mark_errors) {
                 default:
                     valueToPrint = sudokoBoard->board[i][j].value;
             }
-            printCell(valueToPrint, sudokoBoard->board[i][j], mark_errors);             /*print 4 digits - space , number(2 digits) , dot asterisk or space according to cell data*/
+            printCell(valueToPrint, sudokoBoard->board[i][j], mark_errors, mark_fixed);             /*print 4 digits - space , number(2 digits) , dot asterisk or space according to cell data*/
             if (j % sudokoBoard->widthOfBlock == sudokoBoard->widthOfBlock - 1)
                 printf("|");
         }

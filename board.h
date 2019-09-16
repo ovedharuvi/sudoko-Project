@@ -24,7 +24,7 @@ typedef struct {
 sudokoBoard *createBoard(int heightOfBlock , int widthOfBlock , int markErrors);
 sudokoBoard *copyBoard(sudokoBoard *board);
 void destroyBoard(sudokoBoard *board);
-void printBoard(int whatToPrint , sudokoBoard* sudokoBoard, int mark_errors);            /*what to print = 0 --> print cell value
+void printBoard(int whatToPrint, sudokoBoard *sudokoBoard, int mark_errors, int mark_fixed);            /*what to print = 0 --> print cell value
  *                                                                        what to print = 1 --> print cell solution value*/
 
 int checkIfValid(sudokoBoard *board, int value, int row, int column, int to_mark_error);

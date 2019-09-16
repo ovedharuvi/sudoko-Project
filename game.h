@@ -12,6 +12,7 @@
 #endif //SUDOKOPROJECT_GAME_H
 
 #define DEFUALT_SIZE 3
+#define UNUSED(x) (void)(x)
 
 
 StatusType solve_cmd(char ** paramsArray,sudokoBoard *board,MODE *p_mode,int paramNum);/*loads the board x and changes the MODE to SOLVE_MODE*/
