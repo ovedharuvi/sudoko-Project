@@ -15,13 +15,12 @@ typedef struct {
 } cell;
 typedef struct {
     cell **board;
-    int markErrors;
     int heightOfBlock;
     int widthOfBlock;
     int boardSize;
 } sudokoBoard;
 
-sudokoBoard *createBoard(int heightOfBlock , int widthOfBlock , int markErrors);
+sudokoBoard *createBoard(int heightOfBlock, int widthOfBlock);
 sudokoBoard *copyBoard(sudokoBoard *board);
 void destroyBoard(sudokoBoard *board);
 void printBoard(int whatToPrint, sudokoBoard *sudokoBoard, int mark_errors, int mark_fixed);            /*what to print = 0 --> print cell value

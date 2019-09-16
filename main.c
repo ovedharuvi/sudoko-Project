@@ -15,7 +15,7 @@ int main() {
         init_game();
         game_stat = FALSE;
         while (game_stat == FALSE){
-            game_stat = order(&p_board,&mode);
+            game_stat = order(&p_board, &mode);
             if (game_stat==EXIT){
                 prog_stat = EXIT;
             }

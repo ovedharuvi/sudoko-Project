@@ -19,6 +19,7 @@ int str_compare(const char *first, char *second);/*returns 0 if the second strin
 
 
 void init_game() {
+    MarkErrors = TRUE; /*global variable set to TRUE on INIT mode*/
     SetCmdArray();/* init the CMD Array*/
     printf("Welcome to Sudoku Game ! To initialize new board please enter 'edit'."
            "To load a game please enter 'edit' and then the path of your board.");

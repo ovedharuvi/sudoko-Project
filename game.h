@@ -20,7 +20,7 @@ StatusType edit_cmd(char ** paramsArray,sudokoBoard *board,MODE *p_mode,int para
 /*change the MODE to EDIT_MODE. in case of path given loads a board (with mark errors) else creates empty 9*9 board (from board.h) */
 StatusType mark_errors_cmd(char ** paramsArray,sudokoBoard *board,MODE *p_mode,int paramNum);/*change mark errors field in the board*/
 StatusType print_board_cmd(char ** paramsArray,sudokoBoard *board,MODE *p_mode,int paramNum);
-/*mark errors and MODE needs to be considered.in Edit mark_errors is on*/
+/*mark errors and MODE needs to be considered.in Edit MarkErrors is on*/
 StatusType set_cmd(char ** paramsArray,sudokoBoard *board,MODE *p_mode,int paramNum);
 /*sets value in the board according to the MODE. if the cell is error updates the field in the cell.
  * if game is over acts according to the instruction f in set */
@@ -46,7 +46,7 @@ StatusType reset_cmd(char ** paramsArray,sudokoBoard *board,MODE *p_mode,int par
 StatusType exit_program_cmd(char ** paramsArray,sudokoBoard *board,MODE *p_mode,int paramNum);
 /*releases memory by destroyBoard from solver, destroylist ? . prints exit message.*/
 
-
+extern int MarkErrors;
 void SetCmdArray(); /*initialize Command Array*/
 sudokoBoard * load(char *path);/*case when edit with no params load gets NULL and generates 9*9 board*/
 StatusType is_game_over(sudokoBoard *board_ptr); /*returns TRUE if all board is filled else FALSE*/

@@ -12,7 +12,7 @@ int checkIfValid_COLUMN(sudokoBoard *board, int value, int row, int column, Stat
 int checkIfValid_BLOCK(sudokoBoard *board, int value, int row, int column, StatusType to_mark_error);
 
 
-sudokoBoard *createBoard(int heightOfBlock , int widthOfBlock , int markErrors){
+sudokoBoard *createBoard(int heightOfBlock, int widthOfBlock) {
     sudokoBoard *board = (sudokoBoard*)malloc(sizeof(sudokoBoard)) ;
     int i;
     cell** tempBoard;
@@ -25,7 +25,6 @@ sudokoBoard *createBoard(int heightOfBlock , int widthOfBlock , int markErrors){
     board->board = tempBoard;
     board->heightOfBlock=heightOfBlock;
     board->widthOfBlock = widthOfBlock;
-    board->markErrors = markErrors;
     return board;
 }
 
@@ -46,7 +45,7 @@ void copyCell(cell *copyTo , cell *copyFrom){
 
 sudokoBoard *copyBoard(sudokoBoard *board) {
     int boardSize = board->widthOfBlock * board->widthOfBlock, i, j;
-    sudokoBoard *newBoard = createBoard(board->heightOfBlock, board->widthOfBlock, board->markErrors);
+    sudokoBoard *newBoard = createBoard(board->heightOfBlock, board->widthOfBlock);
 
     for (i = 0; i < boardSize; ++i) {
         for (j = 0; j < boardSize; ++j) {
