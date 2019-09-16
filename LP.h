@@ -6,7 +6,7 @@
 #ifndef SUDOKOPROJECT_LP_H
 #define SUDOKOPROJECT_LP_H
 typedef enum {
-    UNSOLVABLE = 0, SOLVABLE = 1, MEMORY_ERROR = 2, GUROBI_ERROR = 4
+    UNSOLVABLE = 0, SOLVABLE = 1
 } GUROBI_RETURN_VALUE;
 int gurobi(sudokoBoard *sudokoBoard, float threshhold, CmdType command, int guessHintRow, int guessHintColumn);
 

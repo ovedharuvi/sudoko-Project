@@ -71,8 +71,7 @@ ACTION* listRedo(){
     currentAction = currentAction->next;
     return  currentAction->prev->action;
 }
-
-void printLastToFirst(){
+/*void printLastToFirst(){
     struct Node* temp = tail;
     if(head == NULL){
         return;
@@ -82,6 +81,7 @@ void printLastToFirst(){
         temp = temp->prev;
     }
 }
+*/
 
 void printFirstToCurrentAction(){
     struct Node* temp = head;

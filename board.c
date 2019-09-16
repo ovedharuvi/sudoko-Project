@@ -5,9 +5,7 @@
 #include <stdio.h>
 #define BLANK_SPACE "  "
 #define CELL_SPACE 4
-typedef enum{
-    EXIT = -1, FALSE = 0, TRUE = 1
-}StatusType;
+
 
 int checkIfValid_ROW(sudokoBoard *board, int value, int row, int column, StatusType to_mark_error);
 int checkIfValid_COLUMN(sudokoBoard *board, int value, int row, int column, StatusType to_mark_error);
@@ -182,7 +180,7 @@ int checkIfValid(sudokoBoard *board, int value, int row, int column, int to_mark
     return FALSE;
 }
 
-int isErroneus(sudokoBoard * board){
+StatusType is_erroneous(sudokoBoard * board){
     int i , j;
 
     for(i = 0 ; i < board->boardSize ; ++i){

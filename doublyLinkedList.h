@@ -27,7 +27,7 @@ ACTION* listUndo();
 ACTION* listRedo();
 
 /*prints the data from the last action to the first action*/
-void printLastToFirst();
+/*void printLastToFirst();*/
 
 /*print the data from the first action made to current action (action history)*/
 void printFirstToCurrentAction();

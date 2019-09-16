@@ -3,15 +3,11 @@
 #include <vss.h>
 #include <fvec.h>
 #include "solver.h"
-#include "LP.h"
-#include "stack.h"
-#include "errors.h"
+
 #define TRIES_FOR_GENERATOR 1000
-#define FORWARD 1
-#define BACKWARD 0
 
 
-sudokoBoard * generator(sudokoBoard *board, int numOfLegalValues, int numOfFixedCells);
+sudokoBoard *generator(sudokoBoard *board, int numOfLegalValues, int numOfFixedCells);
 
 int calcNumOfPotentialValues(sudokoBoard *board);
 
@@ -39,38 +35,44 @@ void prevCellRowAndColumn(sudokoBoard *board, int *pPrevColumn, int *pPrevRow, i
 
 int findNextValue(sudokoBoard *board, int row, int column);
 
-int generate(sudokoBoard *board, int numOfLegalValues, int numOfEmptyCells) {
+sudokoBoard *generate(sudokoBoard *board, int numOfLegalValues, int numOfEmptyCells) {
     int try;
-    if (isEmptySmallerThenLegalVal(board, numOfLegalValues))
-        return ERROR_EMPTY_SMALLER_THEN_LEGAL_VAL;
+    sudokoBoard *workingBoard;
     for (try = 0; try < TRIES_FOR_GENERATOR; ++try) {
-        if (generator(board, numOfLegalValues, numOfEmptyCells))
-            return TRUE;
+        workingBoard = copyBoard(board);
+        if (generator(workingBoard, numOfLegalValues, numOfEmptyCells)) {
+            destroyBoard(board);
+            return workingBoard;
+        }
+        destroyBoard(workingBoard);
     }
-    return FALSE;
+    return NULL;
 }
 
-int validate(sudokoBoard *board) {
+int validate(sudokoBoard *board) {          /*check if board is solvable - if solvable - update solution value*/
     int isSolvable;
     isSolvable = gurobi(board, 0, VALIDATE, 0, 0);
     if (isSolvable == SOLVABLE)
         return SOLVABLE;
-    else {
+    else
         return FALSE;
-    }
+
 }
 
-int guess(sudokoBoard *board, float threshold) {
-    if (isErroneus(board)) {
-        return BOARD_IS_ERRONEUS_ERROR;
-    } else {
-        gurobi(board, threshold, GUESS, 0, 0);
+sudokoBoard *guess(sudokoBoard *board, float threshold) {
+    sudokoBoard *workingBoard = copyBoard(board);
+    if (gurobi(workingBoard, threshold, GUESS, 0, 0) != SOLVABLE) {
+        error_message(unsolvable_board, CmdArray[GUESS]);
+        destroyBoard(workingBoard);
+        return NULL;
     }
+    destroyBoard(board);
+    return workingBoard;
 }
 
 int guessHint(sudokoBoard *board, int row, int column) {
     if (gurobi(board, 0, GUESS_H, row, column) == UNSOLVABLE) {
-        return BOARD_IS_UNSOLVABLE_ERROR;
+        return error_message(unsolvable_board, CmdArray[GUESS_H]);
     }
 }
 
@@ -187,20 +189,20 @@ void nextCellRowAndColumn(sudokoBoard *board, int *pNextColumn, int *pNextRow, c
 
 void lastDynamicRowAndColumn(sudokoBoard *board, int *pLastDynamicCellColumn, int *pLastDynamicCellRow) {
     int tRow, tColumn;
-    tRow = board->boardSize-1;
+    tRow = board->boardSize - 1;
     tColumn = board->boardSize;
-    prevCellRowAndColumn(board , pLastDynamicCellRow , pLastDynamicCellColumn , tRow , tColumn);
+    prevCellRowAndColumn(board, pLastDynamicCellRow, pLastDynamicCellColumn, tRow, tColumn);
 }
 
 void firstDynamicCellRowAndColumn(sudokoBoard *board, int *pFirstDynamicCellColumn, int *pFirstDynamicCellRow) {
-    int tRow , tColumn;
+    int tRow, tColumn;
     tRow = 0;
     tColumn = -1;
-    nextCellRowAndColumn(board , pFirstDynamicCellRow , pFirstDynamicCellColumn , tRow , tColumn);
+    nextCellRowAndColumn(board, pFirstDynamicCellRow, pFirstDynamicCellColumn, tRow, tColumn);
 }
 
 
-sudokoBoard * generator(sudokoBoard *board, int numOfLegalValues, int numOfFixedCells) {
+sudokoBoard *generator(sudokoBoard *board, int numOfLegalValues, int numOfFixedCells) {
     int status;
     status = fillRandomCells(board, numOfLegalValues);
     if (status == 0) {
@@ -219,7 +221,7 @@ int isEmptySmallerThenLegalVal(sudokoBoard *board, int numOfLegalValues) {
     potentialCells = 0;
     for (i = 0; i < board->boardSize; ++i) {
         for (j = 0; j < board->boardSize; ++j) {
-            if(board->board[i][j].value == 0){
+            if (board->board[i][j].value == 0) {
                 potentialCells++;
             }
         }
