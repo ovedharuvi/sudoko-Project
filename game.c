@@ -2,6 +2,7 @@
 // Created by oved on 02/08/2019.
 //
 
+#include <fvec.h>
 #include "game.h"
 
 /*returns TRUE if the row,column and value in the correct range of the board */
@@ -278,19 +279,23 @@ StatusType set_cmd(char **paramsArray, sudokoBoard *board, MODE *p_mode, int par
     maintain_erroneous(i, j, value, board);
 
     /*maintain doubly linked list*/
-    InsertAction(board->board[i][j].value, value, i, j, 0, SET);
+    InsertAction(board->board[i][j].value, value, i, j, FALSE, SET);
 
     /*Set action itself*/
     board->board[i][j].value = value;
     print_board_cmd(paramsArray, board, p_mode, paramNum);
-    status = is_game_over(board);
 
+    /*checks if game over in SOLVE MODE*/
+    if (*p_mode == SOLVE) {
+        status = is_game_over(board);
+        if (status == TRUE) {
+            if (is_erroneous(board) == TRUE) {
+                return error_message(board_errorneus, CmdArray[SET]);/*return error of erroneous*/
+            } else exit_game(board);/*release everything and back to INIT - new function*/
 
-    if (status == TRUE) {
-        if (is_erroneous(board) == TRUE) {
-            return error_message(board_errorneus, CmdArray[SET]);/*return error of erroneous*/
-        } else exit_program();/*release everything and back to INIT - new function*/
-
+        }
+    } else {
+        status = FALSE;
     }
 
     return status;
@@ -374,7 +379,7 @@ StatusType undo_cmd(char **paramsArray, sudokoBoard *board, MODE *p_mode, int pa
             do_set_by_action(*action_ptr, board, TRUE);
             break;
         default:
-            return error_message(invalid_move, CmdArray[cmd]);
+            return FALSE;
     }
 
     print_board_cmd(paramsArray, board, p_mode, paramNum);
@@ -387,7 +392,9 @@ void do_set_by_action(ACTION action, sudokoBoard *board, int is_undo) {
     j = action.column;
     if (is_undo == TRUE) {
         value = action.oldValue;
-    } else { value = action.newValue; }
+    } else {
+        value = action.newValue;
+    }
     board->board[i][j].value = value;
 
 }
@@ -413,8 +420,7 @@ StatusType redo_cmd(char **paramsArray, sudokoBoard *board, MODE *p_mode, int pa
             do_set_by_action(*action_ptr, board, FALSE);
             break;
         default:
-            return error_message(invalid_move, CmdArray[cmd]);
-
+            return FALSE;
     }
     print_board_cmd(paramsArray, board, p_mode, paramNum);
     return FALSE;
@@ -487,7 +493,7 @@ StatusType hint_cmd(char **paramsArray, sudokoBoard *board, MODE *p_mode, int pa
     if (validate(board) != SOLVABLE)
         return error_message(unsolvable_board, CmdArray[HINT]);
     printf("The cell should be set to %d .",
-           board->board[x][y].solution_value);/*make sure with oved I should use validate*/
+           board->board[x][y].solution_value);
 
     return FALSE;
 }
@@ -587,10 +593,8 @@ StatusType exit_program_cmd(char **paramsArray, sudokoBoard *board, MODE *p_mode
     UNUSED (paramNum);
     UNUSED (p_mode);
     UNUSED (paramsArray);
+    exit_game(board);
 
-    destroyList();
-    destroyBoard(board);
-    /*free files*/
     return FALSE;
 }
 
@@ -600,5 +604,10 @@ StatusType check_range(int row, int column, int value, int size) {
         return FALSE;
 
     return TRUE;
+}
+
+void exit_game(sudokoBoard *board_ptr){
+    destroyList();
+    destroyBoard(board_ptr);
 }
 
