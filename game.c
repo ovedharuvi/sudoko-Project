@@ -291,7 +291,7 @@ StatusType set_cmd(char **paramsArray, sudokoBoard *board, MODE *p_mode, int par
         if (status == TRUE) {
             if (is_erroneous(board) == TRUE) {
                 return error_message(board_errorneus, CmdArray[SET]);/*return error of erroneous*/
-            } else exit_game(board);/*release everything and back to INIT - new function*/
+            } else exit_game(board, FALSE);/*Free everything and not exiting program*/
 
         }
     } else {
@@ -548,7 +548,9 @@ StatusType autofill_cmd(char **paramsArray, sudokoBoard *board, MODE *p_mode, in
             fill_legal_values(i, j, copy, statusArray);
             value = check_single_solution(statusArray, n);
             if (value != 0) {
+                InsertAction(board->board[i][j].value,value,i,j,TRUE,AUTOFILL); /*maintain doubly linked list*/
                 board->board[i][j].value = value;
+
             }
         }
     }
@@ -593,9 +595,9 @@ StatusType exit_program_cmd(char **paramsArray, sudokoBoard *board, MODE *p_mode
     UNUSED (paramNum);
     UNUSED (p_mode);
     UNUSED (paramsArray);
-    exit_game(board);
+    UNUSED(board);
 
-    return FALSE;
+    return EXIT;
 }
 
 StatusType check_range(int row, int column, int value, int size) {
@@ -606,8 +608,12 @@ StatusType check_range(int row, int column, int value, int size) {
     return TRUE;
 }
 
-void exit_game(sudokoBoard *board_ptr){
+void exit_game(sudokoBoard *board_ptr, int is_exit_program) {
     destroyList();
     destroyBoard(board_ptr);
+    if (is_exit_program == TRUE){
+        printf("Exiting...");
+    }
+
 }
 

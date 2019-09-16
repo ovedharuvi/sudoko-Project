@@ -22,7 +22,7 @@ int main() {
             }
         }
     }
-    exit_game(p_board);/*function that releases everything*/
+    exit_game(p_board, TRUE);/*function that releases everything*/
     return 0;
 }
 
