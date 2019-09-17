@@ -23,7 +23,9 @@ int LP_OR_ILP(CmdType command);
 void getNumOfCoefficients(sudokoBoard *board, int *pNumOfCoefficients);
 
 /*check that memory allocated successfully*/
-int checkMem(const double *objArray, const char *vtype, const int *mapArray, const int *indArray, const double *valArray);
+int
+checkMem(const double *objArray, const char *vtype, const int *mapArray, const int *indArray, const double *valArray,
+         const double *solArray);
 
 /*fill map array - each potential value for each cell gets 3 cells in map array   (row, column, value)*/
 void fillMap(sudokoBoard *board, int *mapArray);
@@ -72,9 +74,10 @@ int gurobi(sudokoBoard *sudokoBoard, float threshhold, CmdType command, int gues
     obj = (double *) malloc(sizeof(double) * numOfCoefficients);
     vtype = (char *) malloc(sizeof(char) * numOfCoefficients);
     map = (int *) malloc(3 * sizeof(int) * numOfCoefficients);
+    sol = (double *) malloc(sizeof(double) * numOfCoefficients);
     ind = (int *) malloc(sizeof(int) * boardSize);
     val = (double *) malloc(sizeof(double) * boardSize);
-    if (checkMem(obj, vtype, map, ind, val)) {
+    if (checkMem(obj, vtype, map, ind, val, sol)) {
         return error_message(memory_error, CmdArray[command]);
     }
 
@@ -116,9 +119,8 @@ int gurobi(sudokoBoard *sudokoBoard, float threshhold, CmdType command, int gues
             obj[i] = 1;
         } else {
             vtype[i] = GRB_CONTINUOUS;
-            obj[i] = 1;
+            obj[i] = rand() % (boardSize*boardSize);
         }
-
     }
 
     error = GRBaddvars(model, numOfCoefficients, 0, NULL, NULL, NULL, obj, NULL, NULL, vtype, NULL);
@@ -128,34 +130,17 @@ int gurobi(sudokoBoard *sudokoBoard, float threshhold, CmdType command, int gues
 #endif
         goto QUIT;
     }
+    error = GRBupdatemodel(model);
+    if (error) {
+#ifdef DEBUG
+        printf("ERROR %d GRBupdatemodel(): %s\n", error, GRBgeterrormsg(env));
+#endif
+        goto QUIT;
+    }
     /*Add constraints*/
 
     /*Each cell gets one value exactly*/
 
-
-    /*
-    for(i=0 ; i < boardSize ; ++i){
-        currentColumn = i;
-        for(j=0 ; j < boardSize ; j++){
-            currentRow = j;
-            k=0;
-            for(v = 0 ; v < numOfCoefficients ; ++v){
-                if(map[MAP_COLUMN(v)] == currentColumn && map[MAP_ROW(v) == currentRow){
-                    ind[k] = v;
-                    val[k] = 1.0;
-                    k++;
-                }
-            }
-        }
-
-        error = GRBaddconstr(model , k , ind , val , GRB_EQUAL,
-                             1.0 , NULL);
-        if(error)
-            goto QUIT;
-
-    }
-
-*/                  /*this is less efficient way but more simple*/
     i = 0;
     while (i < numOfCoefficients) {
         currentRow = map[MAP_ROW(i)];
@@ -167,6 +152,7 @@ int gurobi(sudokoBoard *sudokoBoard, float threshhold, CmdType command, int gues
             k++;
             i++;
         }
+
         error = GRBaddconstr(model, k, ind, val, GRB_EQUAL,
                              1.0, NULL);
         if (error) {
@@ -212,7 +198,7 @@ int gurobi(sudokoBoard *sudokoBoard, float threshhold, CmdType command, int gues
             for (j = 0; j < numOfCoefficients; ++j) {
                 if (map[MAP_VALUE(j)] == v && map[MAP_COLUMN(j)] == currentColumn) {
                     ind[k] = j;
-                    val[k] = j;
+                    val[k] = 1.0;
                     k++;
                 }
             }
@@ -344,7 +330,7 @@ int actByCommand(sudokoBoard *board, double *solArray, int *mapArray, CmdType co
             currentColumn = mapArray[MAP_COLUMN(i)];
             currentRow = mapArray[MAP_ROW(i)];
 
-            while (mapArray[MAP_ROW(i)] == currentRow && mapArray[MAP_COLUMN(i) == currentColumn]) {
+            while (mapArray[MAP_ROW(i)] == currentRow && mapArray[MAP_COLUMN(i)]  == currentColumn) {
                 if (checkIfValid(board, mapArray[MAP_VALUE(i)], currentRow, currentColumn, FALSE) &&
                     solArray[i] > threshhold) {
                     potentialValues[k] = (float) mapArray[MAP_VALUE(i)];
@@ -352,7 +338,6 @@ int actByCommand(sudokoBoard *board, double *solArray, int *mapArray, CmdType co
                     potentialValues[k] = (float) solArray[i];
                     k++;
                 }
-
                 i++;
                 if (i == numOfCoefficients)
                     break;
@@ -412,25 +397,29 @@ void fillMap(sudokoBoard *board, int *mapArray) {
     k = 0;
     for (i = 0; i < board->boardSize; i++) {
         for (j = 0; j < board->boardSize; j++) {
-            for (v = 1; v <= board->boardSize; v++) {
-                if (checkIfValid(board, v, i, j, FALSE)) {
-                    mapArray[MAP_ROW(k)] = i;
-                    mapArray[MAP_COLUMN(k)] = j;
-                    mapArray[MAP_VALUE(k)] = v;
-                    k++;
+            if (board->board[i][j].value == 0) {
+                for (v = 1; v <= board->boardSize; v++) {
+                    if (checkIfValid(board, v, i, j, FALSE)) {
+                        mapArray[MAP_ROW(k)] = i;
+                        mapArray[MAP_COLUMN(k)] = j;
+                        mapArray[MAP_VALUE(k)] = v;
+                        k++;
+                    }
                 }
             }
         }
     }
 }
 
-/*return 0 if memory didn't allocated successfully , 1 otherwise*/
-int checkMem(const double *objArray, const char *vtype, const int *mapArray, const int *indArray, const double *valArray) {
+/*return 1 if memory didn't allocated successfully , 0 otherwise*/
+int
+checkMem(const double *objArray, const char *vtype, const int *mapArray, const int *indArray, const double *valArray,
+         const double *solArray) {
     if (objArray == NULL || vtype == NULL || mapArray == NULL || indArray == NULL
-        || valArray == NULL) {
-        return 0;
+        || valArray == NULL || solArray == NULL) {
+        return 1;
     }
-    return 1;
+    return 0;
 }
 
 void freeAllocatedMem(double *objArray, char *vtype, int *mapArray, int *indArray, double *valArray, GRBmodel **pBmodel,
@@ -440,8 +429,8 @@ void freeAllocatedMem(double *objArray, char *vtype, int *mapArray, int *indArra
     free(mapArray);
     free(indArray);
     free(valArray);
-    GRBfreeenv(*pBenv);
     GRBfreemodel(*pBmodel);
+    GRBfreeenv(*pBenv);
     free(solArray);
 }
 
@@ -478,13 +467,20 @@ void getUpperRowLeftColumn(int *pUpperRow, int *pLeftColumn, int numOfBLock, int
 
 void
 fillSolValuesInBoard(sudokoBoard *sudokoBoard, const double *solArray, const int *mapArray, int numOfCoefficients) {
-    int i, currentRow, currentColumn, currentValue;
+    int i, j, currentRow, currentColumn, currentValue;
     for (i = 0; i < numOfCoefficients; ++i) {
         if (solArray[i] > 0) {
             currentRow = mapArray[MAP_ROW(i)];
             currentColumn = mapArray[MAP_COLUMN(i)];
             currentValue = mapArray[MAP_VALUE(i)];
             sudokoBoard->board[currentRow][currentColumn].solution_value = currentValue;
+        }
+    }
+    for (i = 0; i < sudokoBoard->boardSize; ++i) {
+        for (j = 0; j < sudokoBoard->boardSize; ++j) {
+            if (sudokoBoard->board[i][j].value > 0) {
+                sudokoBoard->board[i][j].solution_value = sudokoBoard->board[i][j].value;
+            }
         }
     }
 }

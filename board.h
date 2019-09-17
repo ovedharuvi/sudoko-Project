@@ -9,8 +9,6 @@ typedef struct {
     int is_erroneus; /*0 if erroneus 1 if not*/
     int value; /*0 if empty*/
     int solution_value; /*0 if empty*/
-    int *potentialValues;
-    int numOfPotentialValues;
 
 } cell;
 typedef struct {

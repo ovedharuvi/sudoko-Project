@@ -1,7 +1,5 @@
 
 
-#include <vss.h>
-#include <fvec.h>
 #include "solver.h"
 
 #define TRIES_FOR_GENERATOR 1000
@@ -9,7 +7,7 @@
 
 sudokoBoard *generator(sudokoBoard *board, int numOfLegalValues, int numOfFixedCells);
 
-int calcNumOfPotentialValues(sudokoBoard *board);
+
 
 int isEmptySmallerThenLegalVal(sudokoBoard *board, int numOfLegalValues);
 
@@ -34,6 +32,8 @@ void prevCellRowAndColumn(sudokoBoard *board, int *pPrevColumn, int *pPrevRow, i
                           int currentColumn);
 
 int findNextValue(sudokoBoard *board, int row, int column);
+
+void fixAllCells(sudokoBoard *board);
 
 sudokoBoard *generate(sudokoBoard *board, int numOfLegalValues, int numOfEmptyCells) {
     int try;
@@ -86,17 +86,20 @@ int numOfSolutions(sudokoBoard *board) {
     stack *iterationStack;
     sudokoBoard *workingBoard;
     workingBoard = copyBoard(board);
+    fixAllCells(workingBoard);
     iterationStack = createStack();
     numOfSol = 0;
     firstDynamicCellRowAndColumn(workingBoard, &firstDynamicCellColumn, &firstDynamicCellRow);
     lastDynamicRowAndColumn(workingBoard, &lastDynamicColumn, &lastDynamicRow);
-    Push(iterationStack, 0, 0);
+    Push(iterationStack, firstDynamicCellRow, firstDynamicCellColumn);
     while (1) {
         currentIteration = top(iterationStack);
         currentRow = currentIteration->row;
         currentColumn = currentIteration->column;
-        nextCellRowAndColumn(workingBoard, &nextColumn, &nextRow, 0, 0);
-        prevCellRowAndColumn(workingBoard, &prevColumn, &prevRow, 0, 0);
+        if (!(currentRow == lastDynamicRow && currentColumn == lastDynamicColumn))
+            nextCellRowAndColumn(workingBoard, &nextColumn, &nextRow, currentRow, currentColumn);
+        if (!(currentRow == firstDynamicCellRow && currentColumn == firstDynamicCellColumn))
+            prevCellRowAndColumn(workingBoard, &prevColumn, &prevRow, currentRow, currentColumn);
         if (findNextValue(workingBoard, currentRow, currentColumn)) {
             if (currentRow == lastDynamicRow && currentColumn == lastDynamicColumn) {
                 numOfSol++;
@@ -105,7 +108,7 @@ int numOfSolutions(sudokoBoard *board) {
                 Push(iterationStack, nextRow, nextColumn);
             }
         } else {
-            if (currentRow == firstDynamicCellRow && currentColumn == lastDynamicColumn) {
+            if (currentRow == firstDynamicCellRow && currentColumn == firstDynamicCellColumn) {
                 break;
             } else {
                 Pop(iterationStack);
@@ -117,6 +120,17 @@ int numOfSolutions(sudokoBoard *board) {
     return numOfSol;
 }
 
+void fixAllCells(sudokoBoard *board) {
+    int i, j;
+    for (i = 0; i < board->boardSize; ++i) {
+        for (j = 0; j < board->boardSize; ++j) {
+            if (board->board[i][j].value > 0) {
+                board->board[i][j].is_fixed = TRUE;
+            }
+        }
+    }
+}
+
 int findNextValue(sudokoBoard *board, int row, int column) {
     cell *currentCell = &(board->board[row][column]);
     while (1) {
@@ -125,7 +139,7 @@ int findNextValue(sudokoBoard *board, int row, int column) {
             return 0;
         }
         currentCell->value++;
-        if (checkIfValid(board, currentCell->value, row, column)) {
+        if (checkIfValid(board, currentCell->value, row, column, FALSE)) {
             return 1;
         }
     }
@@ -191,14 +205,14 @@ void lastDynamicRowAndColumn(sudokoBoard *board, int *pLastDynamicCellColumn, in
     int tRow, tColumn;
     tRow = board->boardSize - 1;
     tColumn = board->boardSize;
-    prevCellRowAndColumn(board, pLastDynamicCellRow, pLastDynamicCellColumn, tRow, tColumn);
+    prevCellRowAndColumn(board, pLastDynamicCellColumn, pLastDynamicCellRow, tRow, tColumn);
 }
 
 void firstDynamicCellRowAndColumn(sudokoBoard *board, int *pFirstDynamicCellColumn, int *pFirstDynamicCellRow) {
     int tRow, tColumn;
     tRow = 0;
     tColumn = -1;
-    nextCellRowAndColumn(board, pFirstDynamicCellRow, pFirstDynamicCellColumn, tRow, tColumn);
+    nextCellRowAndColumn(board, pFirstDynamicCellColumn, pFirstDynamicCellRow, tRow, tColumn);
 }
 
 
@@ -213,7 +227,7 @@ sudokoBoard *generator(sudokoBoard *board, int numOfLegalValues, int numOfFixedC
         return NULL;
     }
     solutionValueToValue(board, numOfFixedCells);
-    return TRUE;
+    return board;
 }
 
 int isEmptySmallerThenLegalVal(sudokoBoard *board, int numOfLegalValues) {
@@ -255,7 +269,7 @@ int fillCellRandValue(sudokoBoard *board, int row, int column) {
     numOfPotentialValues = 0;
     potentialValues = (int *) malloc(sizeof(int) * board->boardSize);
     for (v = 1; v <= board->boardSize; v++) {
-        if (checkIfValid(board, v, row, column)) {
+        if (checkIfValid(board, v, row, column, FALSE)) {
             potentialValues[numOfPotentialValues] = v;
         }
     }
@@ -295,6 +309,7 @@ void chooseRandFixedCells(sudokoBoard *board, int numOfFixedCells) {
         if (board->board[randRow][randColumn].value == 0) {
             filled++;
             board->board[randRow][randColumn].value = board->board[randRow][randColumn].solution_value;
+            board->board[randRow][randColumn].is_fixed = TRUE;
         }
     }
 }
