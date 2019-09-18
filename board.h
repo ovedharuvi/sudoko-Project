@@ -66,4 +66,4 @@ void printBoard(int whatToPrint, sudokoBoard *sudokoBoard, int mark_errors, int 
 
 StatusType checkIfValid(sudokoBoard *board, int value, int row, int column, int to_mark_error);
 StatusType is_erroneous(sudokoBoard * board);
-#endif //SUDOKOPROJECT_BOARD_H
+#endif

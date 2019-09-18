@@ -7,8 +7,6 @@
 /*Static functions declaration*/
 sudokoBoard *generator(sudokoBoard *board, int numOfLegalValues, int numOfFixedCells);
 
-StatusType isEmptySmallerThanLegalVal(sudokoBoard *board, int numOfLegalValues);
-
 void solutionValueToValue(sudokoBoard *board, int numOfFixedCells);
 
 StatusType fillRandomCells(sudokoBoard *board, int numOfLegalValues);
@@ -32,9 +30,6 @@ void prevCellRowAndColumn(sudokoBoard *board, int *pPrevColumn, int *pPrevRow, i
 StatusType findNextValue(sudokoBoard *board, int row, int column);
 
 void fixAllCells(sudokoBoard *board);
-
-
-
 
 
 /*Public functions implementation - Documentation in header file*/
@@ -72,6 +67,7 @@ int guessHint(sudokoBoard *board, int row, int column) {
     if (gurobi(board, 0, GUESS_H, row, column) == FALSE) {
         return error_message(unsolvable_board, CmdArray[GUESS_H]);
     }
+    return TRUE;
 }
 
 int numOfSolutions(sudokoBoard *board) {
@@ -87,7 +83,12 @@ int numOfSolutions(sudokoBoard *board) {
     fixAllCells(workingBoard);
     iterationStack = createStack();
     numOfSol = 0;
-    nextRow = 0; nextColumn = 0;
+    nextRow = 0;
+    nextColumn = 0;
+    lastDynamicColumn = 0;
+    lastDynamicRow = 0;
+    firstDynamicCellColumn = 0;
+    firstDynamicCellRow = 0;
     firstDynamicCellRowAndColumn(workingBoard, &firstDynamicCellColumn, &firstDynamicCellRow);
     lastDynamicRowAndColumn(workingBoard, &lastDynamicColumn, &lastDynamicRow);
     Push(iterationStack, firstDynamicCellRow, firstDynamicCellColumn);
@@ -154,7 +155,6 @@ StatusType findNextValue(sudokoBoard *board, int row, int column) {
         }
     }
 }
-
 
 
 /*  Call by reference function.
@@ -309,7 +309,7 @@ int fillCellRandValue(sudokoBoard *board, int row, int column) {
     int *potentialValues, numOfPotentialValues, v, randIndex;
     numOfPotentialValues = 0;
     potentialValues = (int *) malloc(sizeof(int) * board->boardSize);
-    if(potentialValues == NULL)
+    if (potentialValues == NULL)
         return FALSE;
     for (v = 1; v <= board->boardSize; v++) {
         if (checkIfValid(board, v, row, column, FALSE)) {

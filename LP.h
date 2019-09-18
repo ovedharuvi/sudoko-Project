@@ -23,4 +23,4 @@
      *                                                                  for cell - board[guesshintRow][guessHintColumn]*/
 int gurobi(sudokoBoard *sudokoBoard, float threshold, CmdType command, int guessHintRow, int guessHintColumn);
 
-#endif //SUDOKOPROJECT_LP_H
+#endif

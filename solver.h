@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include "stack.h"
 #include "LP.h"
-#include "errors.h"
 #ifndef SUDOKOPROJECT_SOLVER_H
 #define SUDOKOPROJECT_SOLVER_H
 /* ----------SOLVER MODULE----------
@@ -51,4 +50,4 @@ sudokoBoard * guess(sudokoBoard *board , float threshold);
 int guessHint(sudokoBoard *board , int row , int column);
 int numOfSolutions(sudokoBoard *board);
 StatusType isEmptySmallerThanLegalVal(sudokoBoard *board, int numOfLegalValues);
-#endif //SUDOKOPROJECT_SOLVER_H
+#endif

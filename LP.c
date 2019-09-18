@@ -75,9 +75,9 @@ int gurobi(sudokoBoard *sudokoBoard, float threshold, CmdType command, int guess
     widthOfBlock = sudokoBoard->widthOfBlock;
     binary = LP_OR_ILP(command);
     solStatus = 0;
+    numOfVars = 0;
     /*check how many variables we need*/
     getNumOfVars(sudokoBoard, &numOfVars);
-
     /*Allocating mamory*/
     obj = (double *) malloc(sizeof(double) * numOfVars);
     vtype = (char *) malloc(sizeof(char) * numOfVars);
@@ -342,6 +342,7 @@ int actByCommand(sudokoBoard *board, double *solArray, int *mapArray, CmdType co
         }
         while (1) {
             int chosenIndex;
+            chosenIndex = 0;
             k = 0;
             currentColumn = mapArray[MAP_COLUMN(i)];
             currentRow = mapArray[MAP_ROW(i)];

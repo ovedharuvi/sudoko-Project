@@ -44,4 +44,4 @@ void Push(stack *stack, int row, int column);
 Iteration *top(stack* stack);
 void Pop(stack *stack);
 void destroyStack(stack *stack);
-#endif //SUDOKOPROJECT_STACK_H
+#endif
