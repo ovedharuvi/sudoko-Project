@@ -1,6 +1,4 @@
-//
-// Created by sharony on 9/9/2019.
-//
+
 #include "errors.h"
 StatusType error_message(ErrorType errorType, CmdInfo cmdInfo) {
     char str[TEXT_SIZE];
@@ -34,7 +32,7 @@ StatusType error_message(ErrorType errorType, CmdInfo cmdInfo) {
             printf("Error.Invalid Type of Parameters for This Command.The Command %s needs Parameters in Type of %s."
                     ,cmdInfo.cmdName,ptoken);
             break;
-        case board_errorneus:
+        case board_erroneous:
             printf("Error.Invalid board for This Command.The Command %s needs board without errors in this MODE.",cmdInfo.cmdName ) ;
             break;
 

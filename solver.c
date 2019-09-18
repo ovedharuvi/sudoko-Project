@@ -9,8 +9,6 @@
 
 sudokoBoard *generator(sudokoBoard *board, int numOfLegalValues, int numOfFixedCells);
 
-int calcNumOfPotentialValues(sudokoBoard *board);
-
 int isEmptySmallerThenLegalVal(sudokoBoard *board, int numOfLegalValues);
 
 void solutionValueToValue(sudokoBoard *board, int numOfFixedCells);
@@ -125,7 +123,7 @@ int findNextValue(sudokoBoard *board, int row, int column) {
             return 0;
         }
         currentCell->value++;
-        if (checkIfValid(board, currentCell->value, row, column)) {
+        if (checkIfValid(board, currentCell->value, row, column,FALSE)) {
             return 1;
         }
     }
@@ -213,7 +211,7 @@ sudokoBoard *generator(sudokoBoard *board, int numOfLegalValues, int numOfFixedC
         return NULL;
     }
     solutionValueToValue(board, numOfFixedCells);
-    return TRUE;
+    return board;
 }
 
 int isEmptySmallerThenLegalVal(sudokoBoard *board, int numOfLegalValues) {
@@ -255,7 +253,7 @@ int fillCellRandValue(sudokoBoard *board, int row, int column) {
     numOfPotentialValues = 0;
     potentialValues = (int *) malloc(sizeof(int) * board->boardSize);
     for (v = 1; v <= board->boardSize; v++) {
-        if (checkIfValid(board, v, row, column)) {
+        if (checkIfValid(board, v, row, column,FALSE)) {
             potentialValues[numOfPotentialValues] = v;
         }
     }

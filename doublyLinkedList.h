@@ -1,12 +1,10 @@
-#include "board.h"
+
 #include <stdio.h>
 #include <stdlib.h>
+#include "cmdType.h"
 #ifndef SUDOKOPROJECT_DOUBLYLINKEDLIST_H
 #define SUDOKOPROJECT_DOUBLYLINKEDLIST_H
-typedef enum {
-    SOLVE = 0,EDIT = 1,MARK = 2, PRINT = 3, SET = 4, VALIDATE = 5, GUESS = 6, GENERATE = 7, UNDO = 8,
-    REDO = 9, SAVE = 10, HINT = 11, GUESS_H = 12, NUM_S = 13, AUTOFILL = 14, RESET = 15, EXIT_GAME = 16, INVALID =17
-}CmdType;
+
 
 typedef struct{
     int oldValue;
@@ -30,7 +28,6 @@ ACTION* listRedo();
 /*void printLastToFirst();*/
 
 /*print the data from the first action made to current action (action history)*/
-void printFirstToCurrentAction();
 
 void destroyList();
-#endif //SUDOKOPROJECT_DOUBLYLINKEDLIST_H
+#endif
