@@ -5,9 +5,7 @@
  * This module is a data structure of the gaming board.
  * Contains the data structure itself and basic functions for boards
  * like create board, copy board , destroy board and check all kind of things in a given board*/
-typedef enum{
-    EXIT = -1, FALSE = 0, TRUE = 1
-}StatusType;
+#include "status.h"
 typedef struct {
     int is_fixed; /*0 if fixed 1 if not fixed */
     int is_erroneus; /*0 if erroneus 1 if not*/

@@ -1,20 +1,17 @@
-//
-// Created by oved on 02/08/2019.
-//
 
 #ifndef SUDOKOPROJECT_GAME_H
 #define SUDOKOPROJECT_GAME_H
 
 
-#include "solver.h"
+#include "check.h"
 #include "doublyLinkedList.h"
-
-#endif //SUDOKOPROJECT_GAME_H
+#include <string.h>
 
 #define DEFUALT_SIZE 3
 #define UNUSED(x) (void)(x)
 
 
+void init_game();  /*initialize the command array and sends welcome message*/
 StatusType solve_cmd(char ** paramsArray,sudokoBoard *board,MODE *p_mode,int paramNum);/*loads the board x and changes the MODE to SOLVE_MODE*/
 StatusType edit_cmd(char ** paramsArray,sudokoBoard *board,MODE *p_mode,int paramNum);
 /*change the MODE to EDIT_MODE. in case of path given loads a board (with mark errors) else creates empty 9*9 board (from board.h) */
@@ -46,9 +43,11 @@ StatusType reset_cmd(char ** paramsArray,sudokoBoard *board,MODE *p_mode,int par
 StatusType exit_program_cmd(char ** paramsArray,sudokoBoard *board,MODE *p_mode,int paramNum);
 /*releases memory by destroyBoard from solver, destroylist ? . prints exit message.*/
 
-extern int MarkErrors;
+
 void SetCmdArray(); /*initialize Command Array*/
 sudokoBoard * load(char *path);/*case when edit with no params load gets NULL and generates 9*9 board*/
 StatusType is_game_over(sudokoBoard *board_ptr); /*returns TRUE if all board is filled else FALSE*/
-void exit_game(sudokoBoard *board_ptr);
+void exit_game(sudokoBoard *board_ptr, int is_exit_program);
 
+extern int MarkErrors;
+#endif

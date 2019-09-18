@@ -1,8 +1,5 @@
-//
-// Created by oved on 02/08/2019.
-//
 
-#include <fvec.h>
+/*#include <fvec.h>*/
 #include "game.h"
 
 /*returns TRUE if the row,column and value in the correct range of the board */
@@ -20,6 +17,17 @@ int check_single_solution(StatusType *array, int boardSize);
 StatusType get_size(int *p_m, int *p_n, char **pString);
 
 StatusType fill_board(sudokoBoard *boardPtr, char *pString);
+
+CmdInfo  CmdArray[ORDERS_NUM];
+int MarkErrors;
+
+void init_game() {
+    MarkErrors = TRUE; /*global variable set to TRUE on INIT mode*/
+    SetCmdArray();/* init the CMD Array*/
+    printf("Welcome to Sudoku Game ! To initialize new board please enter 'edit'.\n"
+           "To load a game please enter 'edit' and then the path of your board.");
+
+}
 
 void SetTableInfo(CmdType cmdtype,
                   StatusType (*fun_ptr)(char **, sudokoBoard *, MODE *, int),
@@ -49,7 +57,7 @@ void SetCmdArray() {
     SetTableInfo(NUM_S, &num_s_cmd, EDIT_MODE + SOLVE_MODE, 0, None, "num_solutions");
     SetTableInfo(AUTOFILL, &autofill_cmd, SOLVE_MODE, 0, None, "autofill");
     SetTableInfo(RESET, &reset_cmd, EDIT_MODE + SOLVE_MODE, 0, None, "reset");
-    SetTableInfo(EXIT, &exit_program_cmd, INIT_MODE + EDIT_MODE + SOLVE_MODE, 0, None, "exit");
+    SetTableInfo(EXIT_GAME, &exit_program_cmd, INIT_MODE + EDIT_MODE + SOLVE_MODE, 0, None, "exit");
 }
 
 /*
@@ -63,7 +71,7 @@ CmdInfo Guess ={&guess_cmd, SOLVE_MODE, 1, Float, "guess"};
 CmdInfo Generate ={&generate_cmd, EDIT_MODE, 2, Integer, "generate"};
 CmdInfo Undo ={&undo_cmd, EDIT_MODE + SOLVE_MODE, 0, None, "undo"};
 CmdInfo Redo ={&redo_cmd, EDIT_MODE + SOLVE_MODE, 0, None, "redo"};
-CmdInfo Save ={&save_cmd, EDIT_MODE + SOLVE_MODE, 1, String, "save"};    //in edit mode :validate, all fixed cells
+CmdInfo Save ={&save_cmd, EDIT_MODE + SOLVE_MODE, 1, String, "save"};
 CmdInfo Hint ={&hint_cmd, SOLVE_MODE , 2, Integer, "hint"};
 CmdInfo Guess_h ={&guess_h_cmd, SOLVE_MODE, 2, Integer, "guess_hint"};
 CmdInfo Num_s ={&num_s_cmd, EDIT_MODE + SOLVE_MODE, 0, None, "num_solutions"};
@@ -286,12 +294,12 @@ StatusType set_cmd(char **paramsArray, sudokoBoard *board, MODE *p_mode, int par
     print_board_cmd(paramsArray, board, p_mode, paramNum);
 
     /*checks if game over in SOLVE MODE*/
-    if (*p_mode == SOLVE) {
+    if (*p_mode == SOLVE_MODE) {
         status = is_game_over(board);
         if (status == TRUE) {
             if (is_erroneous(board) == TRUE) {
-                return error_message(board_errorneus, CmdArray[SET]);/*return error of erroneous*/
-            } else exit_game(board);/*release everything and back to INIT - new function*/
+                return error_message(board_erroneous, CmdArray[SET]);/*return error of erroneous*/
+            } else exit_game(board, FALSE);/*Free everything and not exiting program*/
 
         }
     } else {
@@ -332,7 +340,7 @@ StatusType guess_cmd(char **paramsArray, sudokoBoard *board, MODE *p_mode, int p
     }
 
     if (is_erroneous(board) == TRUE)
-        return error_message(board_errorneus, CmdArray[GUESS]);
+        return error_message(board_erroneous, CmdArray[GUESS]);
 
     copy = guess(board, f);
     make_board_equal(board, copy, GUESS);
@@ -438,7 +446,7 @@ StatusType save_cmd(char **paramsArray, sudokoBoard *board, MODE *p_mode, int pa
    /*can't save an erroneous board in EDITs mode*/
     if(*p_mode == EDIT_MODE){
         if (is_erroneous(board) == TRUE){
-            return error_message(board_errorneus,CmdArray[SAVE]);
+            return error_message(board_erroneous,CmdArray[SAVE]);
         }
         if(validate(board) == UNSOLVABLE){
             return error_message(unsolvable_board,CmdArray[SAVE]);
@@ -483,7 +491,7 @@ StatusType hint_cmd(char **paramsArray, sudokoBoard *board, MODE *p_mode, int pa
     UNUSED (p_mode);
 
     if (is_erroneous(board) == TRUE)
-        return error_message(board_errorneus, CmdArray[HINT]);
+        return error_message(board_erroneous, CmdArray[HINT]);
     x = atoi(paramsArray[0]) - 1;
     y = atoi(paramsArray[1]) - 1;
     if (board->board[x][y].is_fixed)
@@ -530,7 +538,7 @@ StatusType num_s_cmd(char **paramsArray, sudokoBoard *board, MODE *p_mode, int p
     UNUSED (paramsArray);
 
     if (is_erroneous(board) == TRUE)
-        return error_message(board_errorneus, CmdArray[NUM_S]);
+        return error_message(board_erroneous, CmdArray[NUM_S]);
     result = numOfSolutions(board);
     printf("The number of solutions of this board is %d", result);
     return FALSE;
@@ -548,7 +556,9 @@ StatusType autofill_cmd(char **paramsArray, sudokoBoard *board, MODE *p_mode, in
             fill_legal_values(i, j, copy, statusArray);
             value = check_single_solution(statusArray, n);
             if (value != 0) {
+                InsertAction(board->board[i][j].value,value,i,j,TRUE,AUTOFILL); /*maintain doubly linked list*/
                 board->board[i][j].value = value;
+
             }
         }
     }
@@ -587,15 +597,17 @@ StatusType reset_cmd(char **paramsArray, sudokoBoard *board, MODE *p_mode, int p
     return FALSE;
 }
 
+
 StatusType exit_program_cmd(char **paramsArray, sudokoBoard *board, MODE *p_mode, int paramNum) {
 
     /*for unused parameters*/
+
     UNUSED (paramNum);
     UNUSED (p_mode);
     UNUSED (paramsArray);
-    exit_game(board);
+    UNUSED(board);
 
-    return FALSE;
+    return EXIT;
 }
 
 StatusType check_range(int row, int column, int value, int size) {
@@ -606,8 +618,12 @@ StatusType check_range(int row, int column, int value, int size) {
     return TRUE;
 }
 
-void exit_game(sudokoBoard *board_ptr){
+void exit_game(sudokoBoard *board_ptr, int is_exit_program) {
     destroyList();
     destroyBoard(board_ptr);
+    if (is_exit_program == TRUE){
+        printf("Exiting...");
+    }
+
 }
 
