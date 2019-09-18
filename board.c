@@ -7,6 +7,14 @@
 #define BLANK_SPACE "  "
 #define CELL_SPACE 4
 
+/*Declaration of static functions*/
+void initBoard(cell ***pBoard, int boardSize);
+
+void copyCell(cell *copyTo, cell *copyFrom);
+
+void print_dashes(sudokoBoard *board);
+
+void printCell(int valueToPrint, cell cellToPrint, int mark_errors,int mark_fixed);
 
 int checkIfValid_ROW(sudokoBoard *board, int value, int row, int column, StatusType to_mark_error);
 
@@ -15,18 +23,27 @@ int checkIfValid_COLUMN(sudokoBoard *board, int value, int row, int column, Stat
 int checkIfValid_BLOCK(sudokoBoard *board, int value, int row, int column, StatusType to_mark_error);
 
 
-void initBoard(cell ***pBoard, int boardSize);
+
+
+/*Implementation of public functions*/
 
 sudokoBoard *createBoard(int heightOfBlock, int widthOfBlock) {
-    sudokoBoard *board = (sudokoBoard *) malloc(sizeof(sudokoBoard));
-    int i;
+    sudokoBoard *board ;
+    int i , boardSize;
     cell **tempBoard;
-    int boardSize = heightOfBlock * widthOfBlock;
-
+    boardSize = heightOfBlock * widthOfBlock;
+    board = (sudokoBoard *) malloc(sizeof(sudokoBoard));
+    if(board == NULL)
+        return NULL;
     board->boardSize = boardSize;
     tempBoard = (cell **) malloc(boardSize * sizeof(cell *));
-    for (i = 0; i < boardSize; ++i)
+    if(tempBoard == NULL)
+        return NULL;
+    for (i = 0; i < boardSize; ++i){
         tempBoard[i] = (cell *) malloc(boardSize * sizeof(cell));
+        if(tempBoard[i] == NULL)
+            return NULL;
+    }
     board->board = tempBoard;
     board->heightOfBlock = heightOfBlock;
     board->widthOfBlock = widthOfBlock;
@@ -34,32 +51,12 @@ sudokoBoard *createBoard(int heightOfBlock, int widthOfBlock) {
     return board;
 }
 
-void initBoard(cell ***pBoard, int boardSize) {
-    int i, j;
-    for (i = 0; i < boardSize; ++i) {
-        for (j = 0; j < boardSize; ++j) {
-            (*pBoard)[i][j].is_fixed = 0;
-            (*pBoard)[i][j].value = 0;
-            (*pBoard)[i][j].solution_value = 0;
-            (*pBoard)[i][j].is_erroneus = 0;
-
-        }
-    }
-}
-
-void copyCell(cell *copyTo, cell *copyFrom) {
-
-    copyTo->is_fixed = copyFrom->is_fixed;
-    copyTo->solution_value = copyFrom->solution_value;
-    copyTo->value = copyFrom->value;
-    copyTo->is_erroneus = copyFrom->is_erroneus;
-}
-
 
 sudokoBoard *copyBoard(sudokoBoard *board) {
     int boardSize = board->widthOfBlock * board->widthOfBlock, i, j;
     sudokoBoard *newBoard = createBoard(board->heightOfBlock, board->widthOfBlock);
-
+    if(newBoard == NULL)
+        return NULL;
     for (i = 0; i < boardSize; ++i) {
         for (j = 0; j < boardSize; ++j) {
             copyCell(&newBoard->board[i][j], &board->board[i][j]);
@@ -67,6 +64,7 @@ sudokoBoard *copyBoard(sudokoBoard *board) {
     }
     return newBoard;
 }
+
 
 void destroyBoard(sudokoBoard *board) {
     int boardSize, i;
@@ -79,30 +77,6 @@ void destroyBoard(sudokoBoard *board) {
     free(board);
 }
 
-void print_dashes(sudokoBoard *board) {
-    int dashes = CELL_SPACE * board->boardSize + board->heightOfBlock + 1;
-    int i;
-
-    for (i = 0; i < dashes; ++i) {
-        printf("-");
-    }
-    printf("\n");
-}
-
-void printCell(int valueToPrint, cell cellToPrint, int mark_errors,
-               int mark_fixed) {    /*print 4 digits - space , number(2 digits) , dot asterisk or space according to cell data*/
-    printf(" ");
-    (valueToPrint == 0) ? printf(BLANK_SPACE) : printf("%2d", valueToPrint);
-    if (mark_fixed == TRUE) {
-        if (cellToPrint.is_fixed) {
-            printf(".");                /* 10.*/  /*fixed cell*/
-        }
-    } else if (cellToPrint.is_erroneus && mark_errors == TRUE) {
-        printf("*");                /* 10**/  /*erroneous cell*/
-    } else {
-        printf(" ");                /* 10 */  /*regular cell*/
-    }
-}
 
 void printBoard(int whatToPrint, sudokoBoard *sudokoBoard, int mark_errors, int mark_fixed) {
     int i, j, valueToPrint;
@@ -131,6 +105,88 @@ void printBoard(int whatToPrint, sudokoBoard *sudokoBoard, int mark_errors, int 
     }
 
 }
+
+
+StatusType checkIfValid(sudokoBoard *board, int value, int row, int column, int to_mark_error) {
+    if (checkIfValid_BLOCK(board, value, row, column, to_mark_error) &&
+        checkIfValid_COLUMN(board, value, row, column, to_mark_error)
+        && checkIfValid_ROW(board, value, row, column, to_mark_error)) {
+        return TRUE;
+    }
+    return FALSE;
+}
+
+
+StatusType is_erroneous(sudokoBoard *board) {
+    int i, j;
+
+    for (i = 0; i < board->boardSize; ++i) {
+        for (j = 0; j < board->boardSize; ++j) {
+            if (board->board[i][j].is_erroneus == 1) {
+                return TRUE;
+            }
+        }
+    }
+    return FALSE;
+}
+
+
+
+
+/*Implementation of static functions*/
+
+void initBoard(cell ***pBoard, int boardSize) {
+    int i, j;
+    for (i = 0; i < boardSize; ++i) {
+        for (j = 0; j < boardSize; ++j) {
+            (*pBoard)[i][j].is_fixed = 0;
+            (*pBoard)[i][j].value = 0;
+            (*pBoard)[i][j].solution_value = 0;
+            (*pBoard)[i][j].is_erroneus = 0;
+
+        }
+    }
+}
+
+
+
+void copyCell(cell *copyTo, cell *copyFrom) {
+
+    copyTo->is_fixed = copyFrom->is_fixed;
+    copyTo->solution_value = copyFrom->solution_value;
+    copyTo->value = copyFrom->value;
+    copyTo->is_erroneus = copyFrom->is_erroneus;
+}
+
+
+
+
+
+void print_dashes(sudokoBoard *board) {
+    int dashes = CELL_SPACE * board->boardSize + board->heightOfBlock + 1;
+    int i;
+
+    for (i = 0; i < dashes; ++i) {
+        printf("-");
+    }
+    printf("\n");
+}
+
+void printCell(int valueToPrint, cell cellToPrint, int mark_errors,
+               int mark_fixed) {    /*print 4 digits - space , number(2 digits) , dot asterisk or space according to cell data*/
+    printf(" ");
+    (valueToPrint == 0) ? printf(BLANK_SPACE) : printf("%2d", valueToPrint);
+    if (mark_fixed == TRUE) {
+        if (cellToPrint.is_fixed) {
+            printf(".");                /* 10.*/  /*fixed cell*/
+        }
+    } else if (cellToPrint.is_erroneus && mark_errors == TRUE) {
+        printf("*");                /* 10**/  /*erroneous cell*/
+    } else {
+        printf(" ");                /* 10 */  /*regular cell*/
+    }
+}
+
 
 
 int checkIfValid_ROW(sudokoBoard *board, int value, int row, int column, StatusType to_mark_error) {
@@ -187,27 +243,6 @@ int checkIfValid_BLOCK(sudokoBoard *board, int value, int row, int column, Statu
     return status;
 }
 
-int checkIfValid(sudokoBoard *board, int value, int row, int column, int to_mark_error) {
-    if (checkIfValid_BLOCK(board, value, row, column, to_mark_error) &&
-        checkIfValid_COLUMN(board, value, row, column, to_mark_error)
-        && checkIfValid_ROW(board, value, row, column, to_mark_error)) {
-        return TRUE;
-    }
-    return FALSE;
-}
-
-StatusType is_erroneous(sudokoBoard *board) {
-    int i, j;
-
-    for (i = 0; i < board->boardSize; ++i) {
-        for (j = 0; j < board->boardSize; ++j) {
-            if (board->board[i][j].is_erroneus == 1) {
-                return TRUE;
-            }
-        }
-    }
-    return FALSE;
-}
 
 
 

@@ -13,14 +13,14 @@
  * example:
  *           0 1 2
  *           3 4 5
- *           6 7 8*/
+ *           6 7 8  */
 void getUpperRowLeftColumn(int *pUpperRow, int *pLeftColumn, int numOfBLock, int heightOfBlock, int widthOfBlock);
 
 /*return 0 if LP command , return 1 if ILP command*/
 int LP_OR_ILP(CmdType command);
 
 /*counts the potential values that are valid for the current state of the board */
-void getNumOfCoefficients(sudokoBoard *board, int *pNumOfCoefficients);
+void getNumOfVars(sudokoBoard *board, int *pNumOfVars);
 
 /*check that memory allocated successfully*/
 int
@@ -52,8 +52,14 @@ void randomChooseByWeight(int numOfValues, const float *potentialValuesArray, in
 void freeAllocatedMem(double *objArray, char *vtype, int *mapArray, int *indArray, double *valArray, GRBmodel **pBmodel,
                       GRBenv **pBenv, double *solArray);
 
-int gurobi(sudokoBoard *sudokoBoard, float threshhold, CmdType command, int guessHintRow, int guessHintColumn) {
-    int numOfCoefficients, i, j, v, k, currentRow, currentColumn, binary;
+
+
+
+
+
+int gurobi(sudokoBoard *sudokoBoard, float threshold, CmdType command, int guessHintRow, int guessHintColumn) {
+    /*Declaration of local variables and GRB variables*/
+    int numOfVars, i, j, v, k, currentRow, currentColumn, binary;
     int heightOfBlock, widthOfBlock, solStatus, error, boardSize;
     GRBenv *env;
     GRBmodel *model;
@@ -62,19 +68,21 @@ int gurobi(sudokoBoard *sudokoBoard, float threshhold, CmdType command, int gues
     double *obj, *sol = NULL;
     char *vtype;
     double objVal;
+
+    /*init local variables*/
     boardSize = sudokoBoard->boardSize;
     heightOfBlock = sudokoBoard->heightOfBlock;
     widthOfBlock = sudokoBoard->widthOfBlock;
     binary = LP_OR_ILP(command);
     solStatus = 0;
     /*check how many variables we need*/
-    getNumOfCoefficients(sudokoBoard, &numOfCoefficients);
+    getNumOfVars(sudokoBoard, &numOfVars);
 
     /*Allocating mamory*/
-    obj = (double *) malloc(sizeof(double) * numOfCoefficients);
-    vtype = (char *) malloc(sizeof(char) * numOfCoefficients);
-    map = (int *) malloc(3 * sizeof(int) * numOfCoefficients);
-    sol = (double *) malloc(sizeof(double) * numOfCoefficients);
+    obj = (double *) malloc(sizeof(double) * numOfVars);
+    vtype = (char *) malloc(sizeof(char) * numOfVars);
+    map = (int *) malloc(3 * sizeof(int) * numOfVars);
+    sol = (double *) malloc(sizeof(double) * numOfVars);
     ind = (int *) malloc(sizeof(int) * boardSize);
     val = (double *) malloc(sizeof(double) * boardSize);
     if (checkMem(obj, vtype, map, ind, val, sol)) {
@@ -84,7 +92,7 @@ int gurobi(sudokoBoard *sudokoBoard, float threshhold, CmdType command, int gues
     /*Mapping the varibles --- each variable mapped to 3 cells (row,column,value)  */
     fillMap(sudokoBoard, map);
 
-    /*Create environment*/
+    /*Create GRB environment*/
 
     error = GRBloadenv(&env, "sudoko.log");
     if (error) {
@@ -96,6 +104,7 @@ int gurobi(sudokoBoard *sudokoBoard, float threshhold, CmdType command, int gues
 
 
     error = GRBsetintparam(env, GRB_INT_PAR_LOGTOCONSOLE, 0);
+    error |= GRBsetintparam(env , GRB_INT_PAR_OUTPUTFLAG , 0);
     if (error) {
 #ifdef DEBUG
         printf("ERROR %d GRBsetintattr(): %s\n", error, GRBgeterrormsg(env));
@@ -113,7 +122,7 @@ int gurobi(sudokoBoard *sudokoBoard, float threshhold, CmdType command, int gues
 
 
     /*Init objective function*/
-    for (i = 0; i < numOfCoefficients; ++i) {
+    for (i = 0; i < numOfVars; ++i) {
         if (binary) {
             vtype[i] = GRB_BINARY;
             obj[i] = 1;
@@ -123,7 +132,7 @@ int gurobi(sudokoBoard *sudokoBoard, float threshhold, CmdType command, int gues
         }
     }
 
-    error = GRBaddvars(model, numOfCoefficients, 0, NULL, NULL, NULL, obj, NULL, NULL, vtype, NULL);
+    error = GRBaddvars(model, numOfVars, 0, NULL, NULL, NULL, obj, NULL, NULL, vtype, NULL);
     if (error) {
 #ifdef DEBUG
         printf("ERROR %d GRBaddvars(): %s\n", error, GRBgeterrormsg(env));
@@ -142,10 +151,12 @@ int gurobi(sudokoBoard *sudokoBoard, float threshhold, CmdType command, int gues
     /*Each cell gets one value exactly*/
 
     i = 0;
-    while (i < numOfCoefficients) {
+    while (i < numOfVars) {
         currentRow = map[MAP_ROW(i)];
         currentColumn = map[MAP_COLUMN(i)];
         k = 0;
+
+
         while (map[MAP_COLUMN(i)] == currentColumn && map[MAP_ROW(i)] == currentRow) {
             ind[k] = i;
             val[k] = 1.0;
@@ -155,6 +166,7 @@ int gurobi(sudokoBoard *sudokoBoard, float threshhold, CmdType command, int gues
 
         error = GRBaddconstr(model, k, ind, val, GRB_EQUAL,
                              1.0, NULL);
+
         if (error) {
 #ifdef DEBUG
             printf("ERROR %d 1st GRBaddconstr(): %s\n", error, GRBgeterrormsg(env));
@@ -163,13 +175,13 @@ int gurobi(sudokoBoard *sudokoBoard, float threshhold, CmdType command, int gues
         }
     }
 
-    /*each value appears one time in a row*/
+    /*Each value appears one time in a row*/
 
     for (v = 1; v <= boardSize; v++) {      /*Each value*/
         for (i = 0; i < boardSize; ++i) {   /*Each row*/
             currentRow = i;
             k = 0;
-            for (j = 0; j < numOfCoefficients; ++j) {
+            for (j = 0; j < numOfVars; ++j) {
                 if (map[MAP_VALUE(j)] == v && map[MAP_ROW(j)] == currentRow) {
                     ind[k] = j;
                     val[k] = 1.0;
@@ -191,11 +203,11 @@ int gurobi(sudokoBoard *sudokoBoard, float threshhold, CmdType command, int gues
 
     /*Each value appears one time in a column*/
 
-    for (v = 1; v <= boardSize; ++v) {
-        for (i = 0; i < boardSize; ++i) {
+    for (v = 1; v <= boardSize; ++v) {          /*Each value*/
+        for (i = 0; i < boardSize; ++i) {       /*Each column*/
             currentColumn = i;
             k = 0;
-            for (j = 0; j < numOfCoefficients; ++j) {
+            for (j = 0; j < numOfVars; ++j) {
                 if (map[MAP_VALUE(j)] == v && map[MAP_COLUMN(j)] == currentColumn) {
                     ind[k] = j;
                     val[k] = 1.0;
@@ -223,7 +235,7 @@ int gurobi(sudokoBoard *sudokoBoard, float threshhold, CmdType command, int gues
             int upperRow, leftColumn;
             k = 0;
             getUpperRowLeftColumn(&upperRow, &leftColumn, i, heightOfBlock, widthOfBlock);
-            for (j = 0; j < numOfCoefficients; ++j) {
+            for (j = 0; j < numOfVars; ++j) {
                 int currentUpperRow, currentLeftColumn;
                 currentUpperRow = (map[MAP_ROW(j)] / heightOfBlock) * heightOfBlock;
                 currentLeftColumn = (map[MAP_COLUMN(j)] / widthOfBlock) * widthOfBlock;
@@ -278,7 +290,7 @@ int gurobi(sudokoBoard *sudokoBoard, float threshhold, CmdType command, int gues
         goto QUIT;
     }
 
-    error = GRBgetdblattrarray(model, GRB_DBL_ATTR_X, 0, numOfCoefficients, sol);
+    error = GRBgetdblattrarray(model, GRB_DBL_ATTR_X, 0, numOfVars, sol);
     if (error) {
 #ifdef DEBUG
         printf("ERROR %d GRBgetdblattrarray(): %s\n", error, GRBgeterrormsg(env));
@@ -289,7 +301,7 @@ int gurobi(sudokoBoard *sudokoBoard, float threshhold, CmdType command, int gues
 
     /*Change the board depends on command*/
     if (solStatus == GRB_OPTIMAL)
-        actByCommand(sudokoBoard, sol, map, command, threshhold, numOfCoefficients, guessHintRow, guessHintColumn);
+        actByCommand(sudokoBoard, sol, map, command, threshold, numOfVars, guessHintRow, guessHintColumn);
 
     QUIT:
 
@@ -298,9 +310,9 @@ int gurobi(sudokoBoard *sudokoBoard, float threshhold, CmdType command, int gues
     if (error)
         return error_message(gurobi_error, CmdArray[VALIDATE]);
     if (solStatus == GRB_OPTIMAL)
-        return SOLVABLE;
+        return TRUE;
     if (solStatus == GRB_INF_OR_UNBD)
-        return UNSOLVABLE;
+        return FALSE;
     else {
         return error_message(gurobi_error, CmdArray[VALIDATE]);
     }
@@ -308,6 +320,10 @@ int gurobi(sudokoBoard *sudokoBoard, float threshhold, CmdType command, int gues
 
 }
 
+
+
+
+/*Implementation of static funcitons*/
 
 int actByCommand(sudokoBoard *board, double *solArray, int *mapArray, CmdType command, double threshhold,
                  int numOfCoefficients, int guessHintRow, int guessHintColumn) {
@@ -350,7 +366,7 @@ int actByCommand(sudokoBoard *board, double *solArray, int *mapArray, CmdType co
             if (i == numOfCoefficients)
                 break;
         }
-        return SOLVABLE;
+        return TRUE;
     }
 
 
@@ -367,9 +383,9 @@ int actByCommand(sudokoBoard *board, double *solArray, int *mapArray, CmdType co
             if (i > numOfCoefficients)
                 break;
         }
-        return SOLVABLE;
+        return TRUE;
     }
-    return 0;
+    return FALSE;
 }
 
 void randomChooseByWeight(int numOfValues, const float *potentialValuesArray, int *pChosenIndex) {
@@ -434,14 +450,14 @@ void freeAllocatedMem(double *objArray, char *vtype, int *mapArray, int *indArra
     free(solArray);
 }
 
-void getNumOfCoefficients(sudokoBoard *board, int *pNumOfCoefficients) {
+void getNumOfVars(sudokoBoard *board, int *pNumOfVars) {
     int i, j, v;
     for (i = 0; i < board->boardSize; i++) {
         for (j = 0; j < board->boardSize; j++) {
             if (board->board[i][j].value == 0) {
                 for (v = 1; v <= board->boardSize; v++) {
                     if (checkIfValid(board, v, i, j, FALSE)) {
-                        (*pNumOfCoefficients)++;
+                        (*pNumOfVars)++;
                     }
                 }
             }

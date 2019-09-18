@@ -27,6 +27,9 @@ stack* createStack(){
 
 void Push(stack *stack, int row, int column) {
     Iteration* newSolveIteration = createStackNode(row, column);
+    if(newSolveIteration == NULL){
+        return;
+    }
     if(stack->top == NULL){
         stack->top = newSolveIteration;
         return;
