@@ -5,7 +5,7 @@ StatusType error_message(ErrorType errorType, CmdInfo cmdInfo) {
     char * ptoken = str;
 
     switch(errorType){
-        case line_limit : printf("Error.You have entered over 256 characters.");break;
+        case line_limit : printf("Error.You have entered over 256 characters.\n please enter a valid command :");break;
         case invalid_cmd : printf("Error. Invalid Command.");break;
         case invalid_mode :
             switch (cmdInfo.mode){
