@@ -1,9 +1,7 @@
 #ifndef SUDOKOPROJECT_BOARD_H
 #define SUDOKOPROJECT_BOARD_H
+#include "status.h"
 
-typedef enum{
-    EXIT = -1, FALSE = 0, TRUE = 1
-}StatusType;
 typedef struct {
     int is_fixed; /*0 if fixed 1 if not fixed */
     int is_erroneus; /*0 if erroneus 1 if not*/
@@ -28,4 +26,4 @@ void printBoard(int whatToPrint, sudokoBoard *sudokoBoard, int mark_errors, int 
 
 int checkIfValid(sudokoBoard *board, int value, int row, int column, int to_mark_error);
 StatusType is_erroneous(sudokoBoard * board);
-#endif //SUDOKOPROJECT_BOARD_H
+#endif

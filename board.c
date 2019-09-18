@@ -83,7 +83,7 @@ void printCell(int valueToPrint, cell cellToPrint, int mark_errors, int mark_fix
         }
     }
     else if (cellToPrint.is_erroneus && mark_errors == TRUE){
-        printf("*");                /* 10**/  /*erroneous cell*/
+        printf("*");                /* 10**/  /*erroneus cell*/
     }
     else{
         printf(" ");                /* 10 */  /*regular cell*/
