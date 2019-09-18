@@ -10,7 +10,7 @@
 Iteration *createStackNode(int row, int column) {
     Iteration* newSolveItaration = (Iteration*)malloc(sizeof(Iteration));
     if(newSolveItaration == NULL)
-        return ERROR_MEMORY_DIDNOT_ALLOCATED;
+        return NULL;
     newSolveItaration->row = row;
     newSolveItaration->column = column;
     newSolveItaration->next = NULL;
@@ -19,7 +19,7 @@ Iteration *createStackNode(int row, int column) {
 stack* createStack(){
     stack* newStack = (stack*)malloc(sizeof(stack));
     if(newStack == NULL)
-        return ERROR_MEMORY_DID_NOT_ALLOCATED;
+        return NULL;
     newStack->top = NULL;
     return newStack;
 }
