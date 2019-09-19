@@ -24,8 +24,8 @@ int MarkErrors;
 void init_game() {
     MarkErrors = TRUE; /*global variable set to TRUE on INIT mode*/
     SetCmdArray();/* init the CMD Array*/
-    printf("Welcome to Sudoku Game ! To initialize new board please enter 'edit'.\n"
-           "To load a game please enter 'edit' and then the path of your board.");
+    printf("Welcome to Sudoku Game ! To initialize new board you can enter 'edit'.\n"
+           "To load a game you can enter 'edit' and then the path of your board.");
 
 }
 
@@ -59,7 +59,6 @@ void SetCmdArray() {
     SetTableInfo(RESET, &reset_cmd, EDIT_MODE + SOLVE_MODE, 0, None, "reset");
     SetTableInfo(EXIT_GAME, &exit_program_cmd, INIT_MODE + EDIT_MODE + SOLVE_MODE, 0, None, "exit");
 }
-
 /*
 CmdInfo Solve ={solve_cmd, INIT_MODE + EDIT_MODE + SOLVE_MODE , 1, String, "solve"};
 CmdInfo Edit ={&edit_cmd, INIT_MODE + EDIT_MODE + SOLVE_MODE, 1, String + None, "edit"};
@@ -203,9 +202,14 @@ StatusType solve_cmd(char **paramsArray, sudokoBoard *board, MODE *p_mode, int p
     if (newBoard == NULL)/*check if load is valid*/
         return error_message(file_error,CmdArray[SOLVE]);
     *p_mode = SOLVE_MODE;
-    destroyBoard(board);
-    board = newBoard;
-    destroyList();/*maintain the doublylinkedlist*/
+
+
+    /*start over board and doubly linked list in case they are initialized*/
+    if (board != NULL){
+        destroyBoard(board);
+        destroyList();/*maintain the doublylinkedlist*/
+    }
+
     print_board_cmd(paramsArray, board, p_mode, paramNum);
 
     return FALSE;
@@ -213,7 +217,7 @@ StatusType solve_cmd(char **paramsArray, sudokoBoard *board, MODE *p_mode, int p
 
 StatusType edit_cmd(char **paramsArray, sudokoBoard *board, MODE *p_mode, int paramNum) {
     sudokoBoard * newBoard;
-    if (paramsArray[0][0] == '\0') {/*check condition, if no parameter*/
+    if (paramsArray[0] == '\0') {/*check condition, if no parameter*/
         newBoard = createBoard(DEFUALT_SIZE, DEFUALT_SIZE);
     } else {
         newBoard = load(paramsArray[paramNum - 1]);/*first and only parameter of solve function - string of the path*/
@@ -223,9 +227,15 @@ StatusType edit_cmd(char **paramsArray, sudokoBoard *board, MODE *p_mode, int pa
         return error_message(file_error,CmdArray[EDIT]);
 
     *p_mode = EDIT_MODE;
-    destroyBoard(board);
+
+    /*start over board and doubly linked list in case they are initialized*/
+    if (board != NULL){
+        destroyBoard(board);
+        destroyList();/*maintain the doublylinkedlist*/
+    }
+
     board = newBoard;
-    destroyList();/*maintain the doublylinkedlist*/
+
     print_board_cmd(paramsArray, board, p_mode, paramNum);
     return FALSE;
 }
@@ -344,6 +354,7 @@ StatusType guess_cmd(char **paramsArray, sudokoBoard *board, MODE *p_mode, int p
 
     copy = guess(board, f);
     make_board_equal(board, copy, GUESS);
+    destroyBoard(copy);
     print_board_cmd(paramsArray, board, p_mode, paramNum);
 
 
@@ -363,6 +374,7 @@ StatusType generate_cmd(char **paramsArray, sudokoBoard *board, MODE *p_mode, in
    }
     copy = generate(board, x, y);
    make_board_equal(board,copy,GENERATE);
+   destroyBoard(copy);
     print_board_cmd(paramsArray, board, p_mode, paramNum);
     return FALSE;
 }

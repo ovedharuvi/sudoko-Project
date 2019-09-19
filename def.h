@@ -15,14 +15,14 @@
 
 
 typedef enum{
-    INIT_MODE = 1,EDIT_MODE = 2,SOLVE_MODE = 3
+    INIT_MODE = 2,EDIT_MODE = 4,SOLVE_MODE = 8
 }MODE;
 
 typedef enum{
     String = 1, Integer = 2, Float = 3, None = 4
 }ParamType;
 typedef struct{
-    StatusType (*fun_ptr)(char **paramsArray, sudokoBoard *board, MODE *p_mode, int paramNum);
+    StatusType (*fun_ptr)(char **paramsArray, sudokoBoard **board, MODE *p_mode, int paramNum);
     MODE mode;
     int paramNum;
     ParamType paramType;

@@ -8,7 +8,7 @@ StatusType check_param_num(int cmd_index, int num_params_given, CmdInfo *cmdArra
 
 StatusType check_valid_params(char *paramArray[], CmdInfo cmdInfo);
 
-StatusType do_order(CmdInfo cmdInfo, MODE *p_mode, int paramNum, char *paramsArray[], sudokoBoard *p_board);
+StatusType do_order(CmdInfo cmdInfo, MODE *p_mode, int paramNum, char *paramsArray[], sudokoBoard **p_board);
 
 StatusType get_cmd(char *text, CmdInfo *cmdArray);
 
@@ -65,15 +65,12 @@ StatusType get_line(
         char *pString) {/*returns FALSE if the user entered more than 256 characters, TRUE if valid 256 characters, EXIT if exit by the user*/
     int c = 0, i = 0;
     StatusType status;
-
-   /* fflush(stdin);*/
+    printf("Please enter a command:");
         while (1) {
         c = getchar();
-       printf("\n%c\n", c);
 
 
         if (c == '\n') {/*command ends with enter from stdin*/
-             printf("end\n");
             status =  TRUE;
             break;
         }
@@ -92,7 +89,6 @@ StatusType get_line(
         pString[i] = (char) c;
 
         i++;
-        printf("i is = %d",i);
 
     }
         fflush(stdin);
@@ -103,22 +99,13 @@ StatusType get_line(
 StatusType get_cmd(char *text, CmdInfo *cmdArray) {
     int i;
     char *pcommand;
-   /* char text_ptr[BUFFERSIZE];*/
     char delimit[] = " \t\r\n\v\f";
 
-    printf("text is %s\n",text);
-    /*
-    string_to_array(text_ptr,*text,BUFFERSIZE);
-    printf("text_ptr is %s\n",text_ptr);
-     */
     pcommand = strtok(text, delimit);
-    printf("pcommand is %s\n",pcommand);
 
     if (pcommand == NULL)
         return (int) INVALID;
-    /*
-    *text = pcommand;*/ /*let text point to the place after the first token by reference*/
-    strcpy(text,pcommand);
+
     for (i = 0; i < ORDERS_NUM; i++) {
         if (str_compare(cmdArray[i].cmdName, pcommand) == TRUE) {
             return i;
@@ -137,27 +124,52 @@ void string_to_array(char textPtr[256], char *string, int size) {
 StatusType get_mode(int index, MODE Mode) {
     /*SOLVE = 0,EDIT = 1,MARK = 2, PRINT = 3, SET = 4, VALIDATE = 5, GUESS = 6, GENERATE = 7, UNDO = 8,
      REDO = 9, SAVE = 10, HINT = 11, GUESS_H = 12, NUM_S = 13, AUTOFILL = 14, RESET = 15, EXIT_GAME = 16, INVALID =17}CmdType*/
-    return (int) CmdArray[index].mode == (int) Mode ? TRUE : FALSE;
+    if ((CmdArray[index].mode) == SOLVE_MODE+EDIT_MODE+INIT_MODE){
+        return TRUE;
+    }
+
+    if ((CmdArray[index].mode) == Mode){
+        return TRUE;
+    }
+
+    if (CmdArray[index].mode == Mode + EDIT_MODE){
+        return TRUE;
+    }
+
+    if (CmdArray[index].mode == Mode + SOLVE_MODE){
+        return TRUE;
+    }
+    return FALSE;
+
 }
 
 
 int get_params(char *text, char **paramsArray) {
     char delimit[] = " \t\r\n\v\f";
-    int i = 0;
+    int i = 0, skip;
     int result = 0;
     char *ptoken;/*the pointer to be returned by strtok*/
+
+    ptoken = strtok(text, delimit);/*/*let text  to be the string after the first token - after the command*/
+    skip = strlen(ptoken)+1;
+    text = text + skip;
+    /*temp = text+skip;*/
+    /*strcpy(text,temp);*/
     while (i < MAX_PARAM) {
 
-        if (i == 0) {
-            ptoken = strtok(text, delimit);
-        } else {
-            ptoken = strtok(NULL, delimit);
-        }
+        ptoken = strtok(text, delimit);
 
         if (ptoken != NULL) {
-            strcpy(paramsArray[i], ptoken);
+            paramsArray[i] = ptoken;
             result++;
             i++;
+            skip = strlen(ptoken)+1;
+            text = text + skip;
+            if (*text =='\0'){
+                break;
+            }
+           /* strcpy(text,temp);*/
+
         } else {
             break;
         }
@@ -166,7 +178,7 @@ int get_params(char *text, char **paramsArray) {
     return result;
 }
 
-StatusType do_order(CmdInfo cmdInfo, MODE *p_mode, int paramNum, char **paramsArray, sudokoBoard *p_board) {
+StatusType do_order(CmdInfo cmdInfo, MODE *p_mode, int paramNum, char **paramsArray, sudokoBoard **p_board) {
     StatusType status;
 
     status = cmdInfo.fun_ptr(paramsArray, p_board, p_mode, paramNum);
@@ -177,10 +189,10 @@ int str_compare(const char *first, char *second) {
     int i;
     for (i = 0; first[i] == second[i]; i++) {
         if (first[i] == '\0') {
-            return 0;
+            return TRUE;
         }
     }
-    return 1;
+    return FALSE;
 }
 
 
