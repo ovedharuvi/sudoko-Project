@@ -84,7 +84,6 @@ sudokoBoard *generate(sudokoBoard *board, int numOfLegalValues, int numOfFixedCe
     for (try = 0; try < TRIES_FOR_GENERATOR; ++try) {
         workingBoard = copyBoard(board);
         if(workingBoard == NULL){
-            error_message(memory_error , CmdArray[GENERATE]);
             return NULL;
         }
 
@@ -93,7 +92,7 @@ sudokoBoard *generate(sudokoBoard *board, int numOfLegalValues, int numOfFixedCe
         }
         destroyBoard(workingBoard);
     }
-    return NULL;
+    return board;
 }
 
 StatusType validate(sudokoBoard *board) {
@@ -104,13 +103,12 @@ sudokoBoard *guess(sudokoBoard *board, float threshold) {
     sudokoBoard *workingBoard;
     workingBoard = copyBoard(board);
     if(workingBoard == NULL){
-        error_message(memory_error , CmdArray[GUESS]);
         return NULL;
     }
     if (gurobi(workingBoard, threshold, GUESS, 0, 0) != TRUE) {
         error_message(unsolvable_board, CmdArray[GUESS]);
         destroyBoard(workingBoard);
-        return NULL;
+        return board;
     }
     return workingBoard;
 }
