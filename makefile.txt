@@ -21,8 +21,6 @@ def.o: def.c board.h
 	$(CC) $(COMP_FLAG) -c $*.c
 LP.o: LP.c LP.h board.h errors.h
 	$(CC) $(COMP_FLAG) $(GUROBI_COMP) -c $*.c
-linked_list.o: linked_list.c linked_list.h
-	$(CC) $(COMP_FLAG) -c $*.c
 errors.o: errors.c errors.h def.c  
 	$(CC) $(COMP_FLAG) -c $*.c
 stack.o: stack.c stack.h

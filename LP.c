@@ -373,12 +373,13 @@ int actByCommand(sudokoBoard *board, double *solArray, int *mapArray, CmdType co
 
     if (command == GUESS_H) {
         i = 0;
+        printf("Value score for cell %d %d:\n" , guessHintColumn , guessHintRow);
         while (mapArray[MAP_ROW(i)] != guessHintRow || mapArray[MAP_COLUMN(i)] != guessHintColumn) {
             i++;
         }
         while (mapArray[MAP_ROW(i)] == guessHintRow && mapArray[MAP_COLUMN(i)] == guessHintColumn) {
             if (solArray[i] > 0) {
-                printf("Score of %d is %f\n", mapArray[MAP_VALUE(i)], solArray[i]);
+                printf("\tScore of %d is %f\n", mapArray[MAP_VALUE(i)], solArray[i]);
             }
             i++;
             if (i > numOfCoefficients)
@@ -467,7 +468,7 @@ void getNumOfVars(sudokoBoard *board, int *pNumOfVars) {
     }
 }
 
-/*return 0 if command needs LP solution, return 1 if command needs ILP solution*/
+
 int LP_OR_ILP(CmdType command) {
     if (command == GUESS_H || command == GUESS) {
         return 0;

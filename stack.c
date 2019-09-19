@@ -43,7 +43,6 @@ void Push(stack *stack, int row, int column) {
 Iteration* top(stack* stack){
     Iteration* temp = stack->top;
     if(stack->top == NULL){
-        printf("Error : stack is empty.\n");
         return NULL;
     }
     return temp;
