@@ -49,7 +49,7 @@ StatusType error_message(ErrorType errorType, CmdInfo cmdInfo) {
             printf("Error. Unsolvable board.\n");
             break;
         case no_moves_error:
-            printf("Error. No mor move left to %s.\n",cmdInfo.cmdName);
+            printf("Error. No more moves left to %s.\n",cmdInfo.cmdName);
             break;
         case gurobi_error:
             printf("Gurobi Error.\n");
