@@ -468,7 +468,7 @@ void getNumOfVars(sudokoBoard *board, int *pNumOfVars) {
     }
 }
 
-/*return 0 if command needs LP solution, return 1 if command needs ILP solution*/
+
 int LP_OR_ILP(CmdType command) {
     if (command == GUESS_H || command == GUESS) {
         return 0;
