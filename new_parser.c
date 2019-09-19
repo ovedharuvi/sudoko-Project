@@ -106,6 +106,7 @@ StatusType get_cmd(char *text, CmdInfo *cmdArray) {
     if (pcommand == NULL)
         return (int) INVALID;
 
+
     for (i = 0; i < ORDERS_NUM; i++) {
         if (str_compare(cmdArray[i].cmdName, pcommand) == TRUE) {
             return i;
@@ -146,34 +147,23 @@ StatusType get_mode(int index, MODE Mode) {
 
 int get_params(char *text, char **paramsArray) {
     char delimit[] = " \t\r\n\v\f";
-    int i = 0, skip;
+    int i = 0;
     int result = 0;
     char *ptoken;/*the pointer to be returned by strtok*/
 
-    ptoken = strtok(text, delimit);/*/*let text  to be the string after the first token - after the command*/
-    skip = strlen(ptoken)+1;
-    text = text + skip;
-    /*temp = text+skip;*/
-    /*strcpy(text,temp);*/
     while (i < MAX_PARAM) {
-
-        ptoken = strtok(text, delimit);
-
-        if (ptoken != NULL) {
+        ptoken = strtok(NULL, delimit);
+        if (ptoken == NULL) {
+            break;
+        }
             paramsArray[i] = ptoken;
             result++;
             i++;
-            skip = strlen(ptoken)+1;
-            text = text + skip;
             if (*text =='\0'){
                 break;
             }
-           /* strcpy(text,temp);*/
 
-        } else {
-            break;
         }
-    }
 
     return result;
 }

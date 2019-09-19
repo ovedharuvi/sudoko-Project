@@ -14,9 +14,7 @@ void fill_legal_values(int row, int column, sudokoBoard *board, StatusType *arra
 
 int check_single_solution(StatusType *array, int boardSize);
 
-StatusType get_size(int *p_m, int *p_n, char *pString);
-
-StatusType fill_board(sudokoBoard *boardPtr, char *pString);
+StatusType fill_board(sudokoBoard **boardPtr, char *pString);
 
 CmdInfo CmdArray[ORDERS_NUM];
 int MarkErrors;
@@ -95,7 +93,6 @@ void make_board_equal(sudokoBoard *board_ptr, sudokoBoard *copy, CmdType cmdType
 }
 
 sudokoBoard *load(char *path) {
-    int m, n;
     StatusType status;
     FILE *file_ptr;
     char *buffer = 0;
@@ -122,82 +119,76 @@ sudokoBoard *load(char *path) {
 
     fclose(file_ptr);
 
-    status = get_size(&m, &n, buffer);
-    if (status == FALSE)
-        return NULL;
-    board_ptr = createBoard(m, n);
-    status = fill_board(board_ptr, buffer);
+    status = fill_board(&board_ptr, buffer);
     if (status == FALSE)
         return NULL;
 
-    /*
-    if (buffer!=NULL) {
-        free(buffer);
-    }
-     */
+    free(buffer);
+
     return board_ptr;
 }
 
-StatusType fill_board(sudokoBoard *boardPtr, char *pString) {
-    int i = 0, j, n, value = 0, status = 0;
+StatusType fill_board(sudokoBoard **boardPtr, char *pString) {
+    int i = 0, j, size, value = 0, status = 0,result = 0,n,m;
     char dot;
-
     char delimit[] = " \t\r\n\v\f";
     char *ptoken;
+    sudokoBoard * newBoard;
 
-    int result = 0;
-
-    n = boardPtr->boardSize;
+    /*creating board*/
 
     ptoken = strtok(pString, delimit);
-    for (i = 0; i < n; i++) {
-        for (j = 0; j < n; j++) {
+    if (ptoken== NULL){
+        return FALSE;
+    }
+    result += sscanf(ptoken, "%d", &m);
+
+    ptoken = strtok(NULL, delimit);
+    if (ptoken== NULL){
+        return FALSE;
+    }
+    result += sscanf(ptoken, "%d", &n);
+
+    if (result != 2) {
+        return FALSE;
+    }
+
+    newBoard = createBoard(m,n);
+    if (newBoard == NULL){
+        return FALSE;
+    }
+    size = newBoard->boardSize;
+
+    result = 0;
+    for (i = 0; i < size; i++) {
+        for (j = 0; j < size; j++) {
+            ptoken = strtok(NULL, delimit);
             if (ptoken == NULL) {
                 break;
             }
 
             status = sscanf(ptoken, "%d%c", &value, &dot);
             if (status > 0) {
-                boardPtr->board[i][j].value = value;
+                newBoard->board[i][j].value = value;
                 result++;
                 if (status == 2) {
-                    boardPtr->board[i][j].is_fixed = TRUE;
+                    newBoard->board[i][j].is_fixed = TRUE;
                 }
             }
             if (pString == '\0') {
                 break;
             }
 
-            ptoken = strtok(NULL, delimit);
-
         }
     }
-    printBoard(FALSE, boardPtr, 1, 1);
-    if (result != n * n)
+
+    if (result != size * size)
         return FALSE;
+
+    *boardPtr = newBoard;
     return TRUE;
 }
 
-StatusType get_size(int *p_m, int *p_n, char *pString) {
-    char delimit[] = " \t\r\n\v\f";
-    char *ptoken;
-    int result = 0, skip;
-
-    if ((ptoken = strtok(pString, delimit)) != NULL)
-        result += sscanf(ptoken, "%d", p_m);
-    skip = strlen(ptoken) ;
-    if ((ptoken = strtok(pString + skip, delimit)) != NULL)
-        result += sscanf(ptoken, "%d", p_n);
-    skip = skip + strlen(ptoken) ;
-
-
-    if (result == 2) {
-        strcpy(pString, pString + skip);/*bring string after these tokens*/
-        return TRUE;
-    }
-
-    return FALSE;
-}
 
 StatusType is_game_over(sudokoBoard *board_ptr) {
     int i, n, j = 0;
@@ -587,22 +578,29 @@ StatusType num_s_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, int 
 
 StatusType autofill_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, int paramNum) {
     sudokoBoard *copy;
-    int i, j, n, value;
-    StatusType statusArray[MAX_BOARD_SIZE];
+    int i, j, n, value , firstInsert;
+    StatusType *statusArray;
+    statusArray = (StatusType*)malloc(sizeof(StatusType)*((*board)->boardSize));
     n = (*board)->boardSize;
+    firstInsert = 1;
     copy = copyBoard(*board);
-
+    if (copy == NULL){
+        return error_message(memory_error,CmdArray[AUTOFILL]);
+    }
     for (i = 0; i < n; i++) {
         for (j = 0; j < n; j++) {
             fill_legal_values(i, j, copy, statusArray);
             value = check_single_solution(statusArray, n);
             if (value != 0) {
-                InsertAction((*board)->board[i][j].value, value, i, j, TRUE, AUTOFILL); /*maintain doubly linked list*/
+                InsertAction((*board)->board[i][j].value, value, i, j,(firstInsert ? FALSE : TRUE), AUTOFILL);
+                firstInsert = 0 ;                                                   /*maintain doubly linked list*/
                 (*board)->board[i][j].value = value;
 
             }
         }
     }
+    destroyBoard(copy);
+    free(statusArray);
     print_board_cmd(paramsArray, board, p_mode, paramNum);
     return FALSE;
 }
