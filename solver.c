@@ -40,7 +40,6 @@ sudokoBoard *generate(sudokoBoard *board, int numOfLegalValues, int numOfFixedCe
     for (try = 0; try < TRIES_FOR_GENERATOR; ++try) {
         workingBoard = copyBoard(board);
         if (generator(workingBoard, numOfLegalValues, numOfFixedCells)) {
-            destroyBoard(board);
             return workingBoard;
         }
         destroyBoard(workingBoard);
@@ -53,13 +52,13 @@ StatusType validate(sudokoBoard *board) {
 }
 
 sudokoBoard *guess(sudokoBoard *board, float threshold) {
-    sudokoBoard *workingBoard = copyBoard(board);
+    sudokoBoard *workingBoard;
+    workingBoard = copyBoard(board);
     if (gurobi(workingBoard, threshold, GUESS, 0, 0) != TRUE) {
         error_message(unsolvable_board, CmdArray[GUESS]);
         destroyBoard(workingBoard);
         return NULL;
     }
-    destroyBoard(board);
     return workingBoard;
 }
 
@@ -101,6 +100,7 @@ int numOfSolutions(sudokoBoard *board) {
         if (findNextValue(workingBoard, currentRow, currentColumn)) {
             if (currentRow == lastDynamicRow && currentColumn == lastDynamicColumn) {
                 numOfSol++;
+                workingBoard->board[currentRow][currentColumn].value = 0;
                 Pop(iterationStack);
             } else {
                 Push(iterationStack, nextRow, nextColumn);
@@ -175,13 +175,18 @@ void prevCellRowAndColumn(sudokoBoard *board, int *pPrevColumn, int *pPrevRow, c
             *pPrevColumn = tColumn;
             return;
         }
-        if (currentColumn == 0) {
+        if (tColumn == 0) {
             tRow--;
             tColumn = board->boardSize - 1;
         } else {
             tColumn--;
         }
         if (tRow == 0 && tColumn == 0) {
+            if (board->board[tRow][tColumn].is_fixed == 0) {
+                *pPrevRow = tRow;
+                *pPrevColumn = tColumn;
+                return;
+            }
             return;
         }
     }
@@ -206,13 +211,18 @@ void nextCellRowAndColumn(sudokoBoard *board, int *pNextColumn, int *pNextRow, c
             *pNextColumn = tColumn;
             return;
         }
-        if (currentColumn == board->boardSize - 1) {
+        if (tColumn == board->boardSize - 1) {
             tRow++;
             tColumn = 0;
         } else {
             tColumn++;
         }
         if (tRow == board->boardSize - 1 && tColumn == board->boardSize - 1) {
+            if (board->board[tRow][tColumn].is_fixed == 0) {
+                *pNextRow = tRow;
+                *pNextColumn = tColumn;
+                return;
+            }
             return;
         }
     }

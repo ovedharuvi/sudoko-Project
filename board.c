@@ -108,11 +108,12 @@ void printBoard(int whatToPrint, sudokoBoard *sudokoBoard, int mark_errors, int 
 
 
 StatusType checkIfValid(sudokoBoard *board, int value, int row, int column, int to_mark_error) {
-    if (checkIfValid_BLOCK(board, value, row, column, to_mark_error) &&
-        checkIfValid_COLUMN(board, value, row, column, to_mark_error)
-        && checkIfValid_ROW(board, value, row, column, to_mark_error)) {
+    int valid = 1;  /*if one of them return FALSE valid is FALSE */
+    valid &= checkIfValid_BLOCK(board, value, row, column, to_mark_error);
+    valid &= checkIfValid_COLUMN(board, value, row, column, to_mark_error);
+    valid &= checkIfValid_ROW(board, value, row, column, to_mark_error);
+    if(valid)
         return TRUE;
-    }
     return FALSE;
 }
 
