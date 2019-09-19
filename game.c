@@ -18,14 +18,14 @@ StatusType get_size(int *p_m, int *p_n, char *pString);
 
 StatusType fill_board(sudokoBoard *boardPtr, char *pString);
 
-CmdInfo  CmdArray[ORDERS_NUM];
+CmdInfo CmdArray[ORDERS_NUM];
 int MarkErrors;
 
 void init_game() {
     MarkErrors = TRUE; /*global variable set to TRUE on INIT mode*/
     SetCmdArray();/* init the CMD Array*/
     printf("Welcome to Sudoku Game ! To initialize new board you can enter 'edit'.\n"
-           "To load a game you can enter 'edit' and then the path of your board.");
+           "To load a game you can enter 'edit' or 'solve' and then the path of your board.");
 
 }
 
@@ -59,6 +59,7 @@ void SetCmdArray() {
     SetTableInfo(RESET, &reset_cmd, EDIT_MODE + SOLVE_MODE, 0, None, "reset");
     SetTableInfo(EXIT_GAME, &exit_program_cmd, INIT_MODE + EDIT_MODE + SOLVE_MODE, 0, None, "exit");
 }
+
 /*
 CmdInfo Solve ={solve_cmd, INIT_MODE + EDIT_MODE + SOLVE_MODE , 1, String, "solve"};
 CmdInfo Edit ={&edit_cmd, INIT_MODE + EDIT_MODE + SOLVE_MODE, 1, String + None, "edit"};
@@ -109,7 +110,7 @@ sudokoBoard *load(char *path) {
     fseek(file_ptr, 0, SEEK_END);
     length = ftell(file_ptr);
     fseek(file_ptr, 0, SEEK_SET);
-    buffer = malloc(length);
+    buffer = (char*)malloc(length);
     if (buffer == NULL) {
         return NULL;
     }
@@ -129,45 +130,49 @@ sudokoBoard *load(char *path) {
     if (status == FALSE)
         return NULL;
 
-
-    free(buffer);
-
+    /*
+    if (buffer!=NULL) {
+        free(buffer);
+    }
+     */
     return board_ptr;
 }
 
 StatusType fill_board(sudokoBoard *boardPtr, char *pString) {
-    int i=0, j, n, value = 0, status = 0,skip;
+    int i = 0, j, n, value = 0, status = 0;
     char dot;
+
     char delimit[] = " \t\r\n\v\f";
     char *ptoken;
+
     int result = 0;
 
     n = boardPtr->boardSize;
 
-    /*bring the string to be after size taken*/
-
     ptoken = strtok(pString, delimit);
-
-
-
-    for (i = 0; i < n; i++)
+    for (i = 0; i < n; i++) {
         for (j = 0; j < n; j++) {
-            if (ptoken != NULL) {
-                status = sscanf(ptoken, "%d%c", &value, &dot);
-                if (status > 0) {
-                    boardPtr->board[i][j].value = value;
-                    result++;
-                    if (status == 2) {
-                        boardPtr->board[i][j].is_fixed = TRUE;
-                    }
-                }
-                skip = strlen(ptoken);
-                pString = pString +skip;
-                ptoken = strtok(pString, delimit);
-            } else {
+            if (ptoken == NULL) {
                 break;
             }
+
+            status = sscanf(ptoken, "%d%c", &value, &dot);
+            if (status > 0) {
+                boardPtr->board[i][j].value = value;
+                result++;
+                if (status == 2) {
+                    boardPtr->board[i][j].is_fixed = TRUE;
+                }
+            }
+            if (pString == '\0') {
+                break;
+            }
+
+            ptoken = strtok(NULL, delimit);
+
         }
+    }
+    printBoard(FALSE, boardPtr, 1, 1);
     if (result != n * n)
         return FALSE;
     return TRUE;
@@ -176,18 +181,18 @@ StatusType fill_board(sudokoBoard *boardPtr, char *pString) {
 StatusType get_size(int *p_m, int *p_n, char *pString) {
     char delimit[] = " \t\r\n\v\f";
     char *ptoken;
-    int result = 0,skip;
+    int result = 0, skip;
 
     if ((ptoken = strtok(pString, delimit)) != NULL)
         result += sscanf(ptoken, "%d", p_m);
-    skip = strlen(ptoken)+1;
-    if ((ptoken = strtok(pString+skip, delimit)) != NULL)
+    skip = strlen(ptoken) ;
+    if ((ptoken = strtok(pString + skip, delimit)) != NULL)
         result += sscanf(ptoken, "%d", p_n);
-        skip = skip + strlen(ptoken)+1;
+    skip = skip + strlen(ptoken) ;
 
 
     if (result == 2) {
-        strcpy(pString,pString+skip);/*bring string after these tokens*/
+        strcpy(pString, pString + skip);/*bring string after these tokens*/
         return TRUE;
     }
 
@@ -207,26 +212,26 @@ StatusType is_game_over(sudokoBoard *board_ptr) {
 }
 
 StatusType solve_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, int paramNum) {
-    sudokoBoard * newBoard;
+    sudokoBoard *newBoard;
     newBoard = load(paramsArray[paramNum - 1]);/*first and only parameter of solve function - string of the path*/
     if (newBoard == NULL)/*check if load is valid*/
-        return error_message(file_error,CmdArray[SOLVE]);
+        return error_message(file_error, CmdArray[SOLVE]);
     *p_mode = SOLVE_MODE;
 
 
     /*start over board and doubly linked list in case they are initialized*/
-    if (board != NULL){
+    if (*board != NULL) {
         destroyBoard(*board);
         destroyList();/*maintain the doublylinkedlist*/
     }
-
+    *board = newBoard;
     print_board_cmd(paramsArray, board, p_mode, paramNum);
 
     return FALSE;
 }
 
 StatusType edit_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, int paramNum) {
-    sudokoBoard * newBoard;
+    sudokoBoard *newBoard;
     if (paramsArray[0] == '\0') {/*check condition, if no parameter*/
         newBoard = createBoard(DEFUALT_SIZE, DEFUALT_SIZE);
     } else {
@@ -234,12 +239,12 @@ StatusType edit_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, int p
     }
 
     if (newBoard == NULL)/*check if load is valid*/
-        return error_message(file_error,CmdArray[EDIT]);
+        return error_message(file_error, CmdArray[EDIT]);
 
     *p_mode = EDIT_MODE;
 
     /*start over board and doubly linked list in case they are initialized*/
-    if (*board != NULL){
+    if (*board != NULL) {
         destroyBoard(*board);
         destroyList();/*maintain the doublylinkedlist*/
     }
@@ -363,6 +368,13 @@ StatusType guess_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, int 
         return error_message(board_erroneous, CmdArray[GUESS]);
 
     copy = guess(*board, f);
+
+    if (copy == *board){
+        return error_message(unsolvable_board,CmdArray[GUESS]);
+    }
+    if (copy == *board) {
+        return error_message(memory_error, CmdArray[GUESS]);
+    }
     make_board_equal(*board, copy, GUESS);
     destroyBoard(copy);
     print_board_cmd(paramsArray, board, p_mode, paramNum);
@@ -373,18 +385,26 @@ StatusType guess_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, int 
 
 StatusType generate_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, int paramNum) {
     int x, y;
-    sudokoBoard * copy;
+    sudokoBoard *copy;
     StatusType status;
 
     x = atoi(paramsArray[0]);
     y = atoi(paramsArray[1]);
-   status = isEmptySmallerThenLegalVal(*board,x);
-   if (status == FALSE){
-       return error_message(incorrect_range,CmdArray[GENERATE]);
-   }
+    status = isEmptySmallerThenLegalVal(*board, x);
+    if (status == FALSE) {
+        return error_message(incorrect_range, CmdArray[GENERATE]);
+    }
+
     copy = generate(*board, x, y);
-   make_board_equal(*board,copy,GENERATE);
-   destroyBoard(copy);
+
+    if (copy == *board){
+        return error_message(unsolvable_board,CmdArray[GENERATE]);
+    }
+    if (copy == *board){
+        return error_message(memory_error,CmdArray[GENERATE]);
+    }
+    make_board_equal(*board, copy, GENERATE);
+    destroyBoard(copy);
     print_board_cmd(paramsArray, board, p_mode, paramNum);
     return FALSE;
 }
@@ -457,44 +477,43 @@ StatusType redo_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, int p
 }
 
 StatusType save_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, int paramNum) {
-    char * path;
+    char *path;
     FILE *file_ptr;
-    int i,j,n;
+    int i, j, n,bool;
 
     /*for unsued parameteres*/
     UNUSED(paramsArray);
     UNUSED(paramNum);
 
-   /*can't save an erroneous board in EDITs mode*/
-    if(*p_mode == EDIT_MODE){
-        if (is_erroneous(*board) == TRUE){
-            return error_message(board_erroneous,CmdArray[SAVE]);
+    /*can't save an erroneous board in EDITs mode*/
+    if (*p_mode == EDIT_MODE) {
+        if (is_erroneous(*board) == TRUE) {
+            return error_message(board_erroneous, CmdArray[SAVE]);
         }
-        if(validate(*board) == UNSOLVABLE){
-            return error_message(unsolvable_board,CmdArray[SAVE]);
+        if (validate(*board) == UNSOLVABLE) {
+            return error_message(unsolvable_board, CmdArray[SAVE]);
         }
     }
 
     path = paramsArray[0];
     n = (*board)->boardSize;
     file_ptr = fopen(path, "w");
-    if (file_ptr == NULL){
-        return error_message(file_error,CmdArray[SAVE]);
+    if (file_ptr == NULL) {
+        return error_message(file_error, CmdArray[SAVE]);
     }
 
-    fprintf(file_ptr, "%d %d \n", (*board)->heightOfBlock,(*board)->widthOfBlock);
-    for (i = 0; i < n ; i++) {
-        for (j = 0; j < n ; j++) {
-            if(*p_mode == EDIT_MODE || (*board)->board[i][j].is_fixed){
-                fprintf(file_ptr,"%d.",(*board)->board[i][j].value);
+    fprintf(file_ptr, "%d %d \n", (*board)->heightOfBlock, (*board)->widthOfBlock);
+    for (i = 0; i < n; i++) {
+        for (j = 0; j < n; j++) {
+            bool = *p_mode == EDIT_MODE && ((*board)->board[i][j].value != 0);
+            if (bool || (*board)->board[i][j].is_fixed) {
+                fprintf(file_ptr, "%d.", (*board)->board[i][j].value);
+            } else {
+                fprintf(file_ptr, "%d", (*board)->board[i][j].value);
             }
-            else{
-                fprintf(file_ptr,"%d",(*board)->board[i][j].value);
-            }
-            if (j != n-1){
+            if (j != n - 1) {
                 fprintf(file_ptr, " ");
-            }
-            else{
+            } else {
                 fprintf(file_ptr, "\n");
             }
         }
@@ -578,7 +597,7 @@ StatusType autofill_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, i
             fill_legal_values(i, j, copy, statusArray);
             value = check_single_solution(statusArray, n);
             if (value != 0) {
-                InsertAction((*board)->board[i][j].value,value,i,j,TRUE,AUTOFILL); /*maintain doubly linked list*/
+                InsertAction((*board)->board[i][j].value, value, i, j, TRUE, AUTOFILL); /*maintain doubly linked list*/
                 (*board)->board[i][j].value = value;
 
             }
@@ -643,7 +662,7 @@ StatusType check_range(int row, int column, int value, int size) {
 void exit_game(sudokoBoard *board_ptr, int is_exit_program) {
     destroyList();
     destroyBoard(board_ptr);
-    if (is_exit_program == TRUE){
+    if (is_exit_program == TRUE) {
         printf("Exiting...");
     }
 
