@@ -230,7 +230,7 @@ StatusType order(sudokoBoard **board_ptr, MODE *p_mode) {
         }
     }
     status = do_order(CmdArray[cmd_index], p_mode, param_num, (char **) paramsArray,
-                      *board_ptr);/*checks inner validation inside any function. returns TRUE if game is over else FALSE*/
+                      board_ptr);/*checks inner validation inside any function. returns TRUE if game is over else FALSE*/
 
     return status;
 }

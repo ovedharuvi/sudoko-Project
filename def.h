@@ -15,7 +15,7 @@
 
 
 typedef enum{
-    INIT_MODE = 2,EDIT_MODE = 4,SOLVE_MODE = 8
+    INIT_MODE = 1,EDIT_MODE = 2,SOLVE_MODE = 3
 }MODE;
 
 typedef enum{
