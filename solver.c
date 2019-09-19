@@ -83,6 +83,11 @@ sudokoBoard *generate(sudokoBoard *board, int numOfLegalValues, int numOfFixedCe
     sudokoBoard *workingBoard;
     for (try = 0; try < TRIES_FOR_GENERATOR; ++try) {
         workingBoard = copyBoard(board);
+        if(workingBoard == NULL){
+            error_message(memory_error , CmdArray[GENERATE]);
+            return NULL;
+        }
+
         if (generator(workingBoard, numOfLegalValues, numOfFixedCells)) {
             return workingBoard;
         }
@@ -98,6 +103,10 @@ StatusType validate(sudokoBoard *board) {
 sudokoBoard *guess(sudokoBoard *board, float threshold) {
     sudokoBoard *workingBoard;
     workingBoard = copyBoard(board);
+    if(workingBoard == NULL){
+        error_message(memory_error , CmdArray[GUESS]);
+        return NULL;
+    }
     if (gurobi(workingBoard, threshold, GUESS, 0, 0) != TRUE) {
         error_message(unsolvable_board, CmdArray[GUESS]);
         destroyBoard(workingBoard);
@@ -123,6 +132,10 @@ int numOfSolutions(sudokoBoard *board) {
     stack *iterationStack;
     sudokoBoard *workingBoard;
     workingBoard = copyBoard(board);
+    if(workingBoard == NULL){
+        error_message(memory_error , CmdArray[NUM_S]);
+        return 0;
+    }
     fixAllCells(workingBoard);
     iterationStack = createStack();
     numOfSol = 0;
