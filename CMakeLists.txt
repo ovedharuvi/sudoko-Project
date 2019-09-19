@@ -3,4 +3,4 @@ project(sudokoProject C)
 
 set(CMAKE_C_STANDARD 90)
 set(CMAKE_C_FLAGS  "${CMAKE_C_FLAGS} -Wall -Wextra -Werror -pedantic-errors")
-add_executable(sudokoProject main.c new_parser.c new_parser.h game.c game.h doublyLinkedList.c doublyLinkedList.h  board.c board.h errors.c errors.h check.h status.h cmdType.h check.c)
+add_executable(sudokoProject main.c parser.c parser.h game.c game.h doublyLinkedList.c doublyLinkedList.h LP.c LP.h solver.c solver.h board.c board.h errors.c errors.h stack.c stack.h status.h cmdType.h def.c cmdType.c status.c)

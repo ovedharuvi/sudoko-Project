@@ -340,7 +340,7 @@ StatusType validate_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, i
     UNUSED (p_mode);
 
     result = validate(*board);
-    printf(result != SOLVABLE ? "The board is unsolvable." : "The board is solvable.");
+    printf(result ? "The board is solvable." : "The board is unsolvable." );
     return FALSE;
 }
 
@@ -381,7 +381,7 @@ StatusType generate_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, i
 
     x = atoi(paramsArray[0]);
     y = atoi(paramsArray[1]);
-    status = isEmptySmallerThenLegalVal(*board, x);
+    status = isEmptySmallerThanLegalVal(*board, x);
     if (status == FALSE) {
         return error_message(incorrect_range, CmdArray[GENERATE]);
     }
@@ -481,7 +481,7 @@ StatusType save_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, int p
         if (is_erroneous(*board) == TRUE) {
             return error_message(board_erroneous, CmdArray[SAVE]);
         }
-        if (validate(*board) == UNSOLVABLE) {
+        if (validate(*board) == FALSE) {
             return error_message(unsolvable_board, CmdArray[SAVE]);
         }
     }
@@ -530,7 +530,7 @@ StatusType hint_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, int p
         return error_message(fixed_cell, CmdArray[HINT]);
     if ((*board)->board[x][y].value != 0)
         return error_message(non_empty_cell, CmdArray[HINT]);
-    if (validate(*board) != SOLVABLE)
+    if (validate(*board) != TRUE)
         return error_message(unsolvable_board, CmdArray[HINT]);
     printf("The cell should be set to %d .",
            (*board)->board[x][y].solution_value);

@@ -3,7 +3,7 @@
 #define SUDOKOPROJECT_GAME_H
 
 
-#include "check.h"
+#include "solver.h"
 #include "doublyLinkedList.h"
 #include <string.h>
 

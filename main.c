@@ -1,6 +1,5 @@
 
-/*#include <fvec.h>*/
-#include "new_parser.h"
+#include "parser.h"
 
 int main() {
     StatusType game_stat , prog_stat;

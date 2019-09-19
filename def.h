@@ -8,7 +8,6 @@
 #define MAX_PARAM 4
 #define TEXT_SIZE 25
 #define ORDERS_NUM 17
-#define MAX_BOARD_SIZE 25
 
 
 

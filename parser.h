@@ -1,8 +1,10 @@
-//
-// Created by oved on 02/08/2019.
-//
+
 
 #ifndef SUDOKOPROJECT_PARSER_H
 #define SUDOKOPROJECT_PARSER_H
+#include "game.h"
 
-#endif //SUDOKOPROJECT_PARSER_H
+StatusType order(sudokoBoard **board_ptr, MODE *p_mode);
+/* returns TRUE if the game is solved  successfully, FALSE otherwise, EXIT to finish the program*/
+
+#endif

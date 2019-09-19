@@ -1,5 +1,7 @@
 #ifndef SUDOKOPROJECT_BOARD_H
 #define SUDOKOPROJECT_BOARD_H
+
+
 /*  ---------- BOARD MODULE ----------
  *
  * This module is a data structure of the gaming board.
