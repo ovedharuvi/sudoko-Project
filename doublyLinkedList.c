@@ -57,19 +57,28 @@ void InsertAction (int oldValue , int newValue, int row , int column , int inser
 }
 
 ACTION* listUndo(){
-    if(currentAction == head){
+    if (currentAction == NULL){
         return NULL;
+    }
+    if(currentAction == head){
+        currentAction = NULL;
+        return head->action;
     }
     currentAction = currentAction->prev;
     return currentAction->next->action;
 }
 
 ACTION* listRedo(){
+    if (currentAction == NULL){
+        currentAction = head;
+        return head->action;
+    }
+
     if(currentAction == tail){
         return NULL;
     }
     currentAction = currentAction->next;
-    return  currentAction->prev->action;
+    return  currentAction->action;
 }
 /*void printLastToFirst(){
     struct Node* temp = tail;
@@ -82,7 +91,7 @@ ACTION* listRedo(){
     }
 }
 */
-
+/*
 void printFirstToCurrentAction(){
     struct Node* temp = head;
     if(head == NULL){
@@ -93,7 +102,7 @@ void printFirstToCurrentAction(){
         temp = temp->next;
     }
 }
-
+*/
 void destroyList(){
     struct Node* temp = tail;
     if(temp == NULL){
@@ -106,7 +115,9 @@ void destroyList(){
     }
     free(temp->action);
     free(temp);
+    /*
     free(head);
     free(tail);
     free(currentAction);
+     */
 }
