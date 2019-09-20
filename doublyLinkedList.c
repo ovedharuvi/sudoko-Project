@@ -73,7 +73,11 @@ ACTION* listRedo(){
 }
 
 void destroyList(){
+
     struct Node* temp = tail;
+    if (head == NULL){
+        return;
+    }
     if(temp == NULL){
         return;
     }
