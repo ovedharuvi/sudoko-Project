@@ -172,25 +172,26 @@ void print_dashes(sudokoBoard *board) {
     }
     printf("\n");
 }
-
+/*print 4 digits - space , number(2 digits) , dot asterisk or space according to cell data*/
 void printCell(int valueToPrint, cell cellToPrint, int mark_errors,
                int mark_fixed) {    /*print 4 digits - space , number(2 digits) , dot asterisk or space according to cell data*/
+
+    char sayfa = ' ';
     printf(" ");
     (valueToPrint == 0) ? printf(BLANK_SPACE) : printf("%2d", valueToPrint);
-    if (mark_fixed == TRUE) {
-        if (cellToPrint.is_fixed) {
-            printf(".");                /* 10.*/  /*fixed cell*/
-        }
-    } else if (cellToPrint.is_erroneus && mark_errors == TRUE) {
-        printf("*");                /* 10**/  /*erroneous cell*/
-    } else {
-        printf(" ");                /* 10 */  /*regular cell*/
+    if(mark_fixed == 1){
+        sayfa = cellToPrint.is_fixed ? '.' : ' ';
     }
+    if(mark_errors == 1){
+        sayfa = cellToPrint.is_erroneus ? '*' : ' ';
+    }
+    printf("%c" , sayfa);
 }
 
 
 
 int checkIfValid_ROW(sudokoBoard *board, int value, int row, int column, StatusType to_mark_error) {
+
     int i;
     StatusType status = TRUE;
 

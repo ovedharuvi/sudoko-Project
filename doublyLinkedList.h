@@ -1,7 +1,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "cmdType.c"
+#include "cmdType.h"
 #ifndef SUDOKOPROJECT_DOUBLYLINKEDLIST_H
 #define SUDOKOPROJECT_DOUBLYLINKEDLIST_H
 
