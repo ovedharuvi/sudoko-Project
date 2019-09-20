@@ -88,7 +88,7 @@ StatusType hint_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, int p
 
 /* calls guessHint from the solver.
  * 'cmd' return value.
- * possible errors : incorrect range of parameters.*/
+ * possible errors: board is erroneous,board is unsolvable, cell is fixed, non empty cell.*/
 StatusType guess_h_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, int paramNum);
 
 /* calls numOfSolutions from the solver and prints it to the user.
@@ -595,7 +595,7 @@ StatusType redo_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, int p
 StatusType save_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, int paramNum) {
     char *path;
     FILE *file_ptr;
-    int i, j, n, bool;
+    int i, j, n, bool1,bool2;
 
     /*for unsued parameteres*/
     UNUSED(paramsArray);
@@ -621,8 +621,9 @@ StatusType save_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, int p
     fprintf(file_ptr, "%d %d \n", (*board)->heightOfBlock, (*board)->widthOfBlock);
     for (i = 0; i < n; i++) {
         for (j = 0; j < n; j++) {
-            bool = *p_mode == EDIT_MODE && ((*board)->board[i][j].value != 0);
-            if (bool || (*board)->board[i][j].is_fixed) {
+            bool1 = (*p_mode == EDIT_MODE) && ((*board)->board[i][j].value != 0);
+            bool2 = ((*board)->board[i][j].is_fixed) && ((*board)->board[i][j].value != 0);
+            if (bool1 || bool2) {
                 fprintf(file_ptr, "%d.", (*board)->board[i][j].value);
             } else {
                 fprintf(file_ptr, "%d", (*board)->board[i][j].value);
@@ -683,6 +684,12 @@ StatusType guess_h_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, in
         return error_message(incorrect_range, CmdArray[GUESS_H]);
     }
 
+    if ((*board)->board[i][j].is_fixed)
+        return error_message(fixed_cell, CmdArray[GUESS_H]);
+
+    if ((*board)->board[i][j].value != 0)
+        return error_message(non_empty_cell, CmdArray[GUESS_H]);
+
     guessHint(*board, i, j);
     return FALSE;
 }
@@ -698,7 +705,7 @@ StatusType num_s_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, int 
     if (is_erroneous(*board) == TRUE)
         return error_message(board_erroneous, CmdArray[NUM_S]);
     result = numOfSolutions(*board);
-    printf("The board has %d different solutions. ", result);
+    printf("The board has %d different solutions. \n", result);
     return FALSE;
 }
 
