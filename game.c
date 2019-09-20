@@ -30,9 +30,11 @@ int check_single_solution(StatusType *array, int boardSize);
 StatusType fill_board(sudokoBoard **boardPtr, char *pString);
 
 /*loads the board x and changes the MODE to SOLVE_MODE.
- * return value : returns if change in the board has may of happen - TRUE in case of the command succes */
+ * return value : returns if change in the board has may of happen - TRUE in case of the command succeed. */
 StatusType solve_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode,
                      int paramNum);
+
+
 StatusType edit_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, int paramNum);
 
 /*change the MODE to EDIT_MODE. in case of path given loads a board (with mark errors) else creates empty 9*9 board (from board.h) */
@@ -394,7 +396,9 @@ StatusType is_game_over(sudokoBoard *board_ptr) {
 
 
     void maintain_erroneous(int row, int column, int value, sudokoBoard *board) {
+    if (value > 0) {
         checkIfValid(board, value, row, column, TRUE);
+    }
 
     }
 
