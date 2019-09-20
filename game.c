@@ -117,6 +117,7 @@ sudokoBoard *load(char *path);
 /*returns TRUE if all board is filled else FALSE*/
 StatusType is_game_over(sudokoBoard *board_ptr);
 
+void SetCmdArray(); /*initialize Command Array*/
 
 CmdInfo CmdArray[ORDERS_NUM];
 int MarkErrors;
@@ -786,6 +787,9 @@ void maintain_erroneous(sudokoBoard *board) {
 
     for (i = 0 ; i < n; i++){
         for(j = 0 ; j < n ; j++){
+            if (board->board[i][j].value == 0){
+                continue;
+            }
             status = checkIfValid(board,board->board[i][j].value,i,j);
             if (status){
                 board->board[i][j].is_erroneus = 0;

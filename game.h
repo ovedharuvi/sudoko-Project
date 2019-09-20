@@ -22,18 +22,22 @@
  * in exit_cmd - returns EXIT.
  * else - returns FALSE.
  * if the function failed - returns FALSE and prints error message.
+ *
+ * Global MarkErrors variable uses the program to decide if to mark
  * */
 
 /* -----Documentation of public Functions-----
- *init_game() : initialize MarkErrors global variable, sets command array info ans sends welcome message.
- * exit_game(sudokoBoard *board_ptr, int is_exit_program) releases memory, in case of is_exit_program sending
- * exit message.
+ * init_game : initialize MarkErrors global variable, sets command array info ans sends welcome message.
  *
+ * exit_game : releases memory, in case of is_exit_program sending exit message.
+ *
+ * maintain_erroneous : maintains erroneous field of each cell in the board
+ *
+ * check_game_over :
  *                  */
 void init_game();
 void exit_game(sudokoBoard *board_ptr, int is_exit_program);
-void SetCmdArray(); /*initialize Command Array*/
-void maintain_erroneous(sudokoBoard * board);/*maintains erroneous field of each cell in the board*/
+void maintain_erroneous(sudokoBoard * board);
 StatusType check_game_over(sudokoBoard *board, CmdInfo cmdInfo);
 extern int MarkErrors;
 #endif
