@@ -23,7 +23,7 @@
  * else - returns FALSE.
  * if the function failed - returns FALSE and prints error message.
  *
- * Global MarkErrors variable uses the program to decide if to mark
+ * Global MarkErrors variable uses the program to decide if to the program should mark errors.
  * */
 
 /* -----Documentation of public Functions-----
@@ -39,5 +39,7 @@ void init_game();
 void exit_game(sudokoBoard *board_ptr, int is_exit_program);
 void maintain_erroneous(sudokoBoard * board);
 StatusType check_game_over(sudokoBoard *board, CmdInfo cmdInfo);
+/*prints the board and calls printBoard*/
+StatusType print_board_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, int paramNum);
 extern int MarkErrors;
 #endif
