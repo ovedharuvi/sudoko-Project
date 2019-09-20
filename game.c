@@ -259,7 +259,7 @@ StatusType fill_board(sudokoBoard **boardPtr, char *pString) {
 
             status = sscanf(ptoken, "%d%c", &value, &dot);
             if (status > 0) {
-                if(check_range(i,j,value,n)== FALSE){
+                if(check_range(i,j,value,size)== FALSE){
                     return FALSE;
                 }
                 newBoard->board[i][j].value = value;

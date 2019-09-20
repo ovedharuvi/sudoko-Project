@@ -17,14 +17,20 @@
 
 /*------------General Information----------
  * All orders function are build in the same way : starts with 'cmd'.
- * The return value is StatusType: if the function failed - returns FALSE and prints error message.
- * if the function */
+ * The return value is StatusType represents if change has been made to the board.:
+ * if the function succeed and changed something in the board - returns TRUE.
+ * in exit_cmd - returns EXIT.
+ * else - returns FALSE.
+ * if the function failed - returns FALSE and prints error message.
+ * */
 
 /* -----Documentation of public Functions-----
- *
+ *init_game() : initialize MarkErrors global variable, sets command array info ans sends welcome message.
+ * exit_game(sudokoBoard *board_ptr, int is_exit_program) releases memory, in case of is_exit_program sending
+ * exit message.
  *
  *                  */
-void init_game();  /*sends welcome message*/
+void init_game();
 void exit_game(sudokoBoard *board_ptr, int is_exit_program);
 void SetCmdArray(); /*initialize Command Array*/
 void maintain_erroneous(sudokoBoard * board);/*maintains erroneous field of each cell in the board*/
