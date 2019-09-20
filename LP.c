@@ -77,11 +77,13 @@ int gurobi(sudokoBoard *sudokoBoard, float threshold, CmdType command, int guess
     /*Allocating mamory*/
     obj = (double *) malloc(sizeof(double) * numOfVars);
     vtype = (char *) malloc(sizeof(char) * numOfVars);
-    map = (int *) malloc(3 * sizeof(int) * numOfVars); /*Mapping the varibles --- each variable mapped to 3 cells (row,column,value)*/
+    map = (int *) malloc(3 * sizeof(int) *
+                         numOfVars); /*Mapping the varibles --- each variable mapped to 3 cells (row,column,value)*/
     sol = (double *) malloc(sizeof(double) * numOfVars);
     ind = (int *) malloc(sizeof(int) * boardSize);
     val = (double *) malloc(sizeof(double) * boardSize);
     if (checkMem(obj, vtype, map, ind, val, sol)) {
+        freeAllocatedMem(obj, vtype, map, ind, val, NULL, NULL, sol);
         return error_message(memory_error, CmdArray[command]);
     }
 
@@ -100,7 +102,7 @@ int gurobi(sudokoBoard *sudokoBoard, float threshold, CmdType command, int guess
 
 
     error = GRBsetintparam(env, GRB_INT_PAR_LOGTOCONSOLE, 0);
-    error =  error || GRBsetintparam(env, GRB_INT_PAR_OUTPUTFLAG, 0);
+    error = error || GRBsetintparam(env, GRB_INT_PAR_OUTPUTFLAG, 0);
     if (error) {
 #ifdef DEBUG
         printf("ERROR %d GRBsetintattr(): %s\n", error, GRBgeterrormsg(env));
@@ -370,7 +372,7 @@ int actByCommand(sudokoBoard *board, double *solArray, int *mapArray, CmdType co
 
     if (command == GUESS_H) {
         i = 0;
-        printf("Value score for cell %d %d:\n", guessHintColumn +1, guessHintRow+1);
+        printf("Value score for cell %d %d:\n", guessHintColumn + 1, guessHintRow + 1);
         while (mapArray[MAP_ROW(i)] != guessHintRow || mapArray[MAP_COLUMN(i)] != guessHintColumn) {
             i++;
         }
@@ -439,14 +441,22 @@ checkMem(const double *objArray, const char *vtype, const int *mapArray, const i
 
 void freeAllocatedMem(double *objArray, char *vtype, int *mapArray, int *indArray, double *valArray, GRBmodel **pBmodel,
                       GRBenv **pBenv, double *solArray) {
-    free(objArray);
-    free(vtype);
-    free(mapArray);
-    free(indArray);
-    free(valArray);
-    GRBfreemodel(*pBmodel);
-    GRBfreeenv(*pBenv);
-    free(solArray);
+    if (objArray != NULL)
+        free(objArray);
+    if (vtype != NULL)
+        free(vtype);
+    if (mapArray != NULL)
+        free(mapArray);
+    if (mapArray != NULL)
+        free(indArray);
+    if (valArray != NULL)
+        free(valArray);
+    if (pBmodel != NULL)
+        GRBfreemodel(*pBmodel);
+    if (pBenv != NULL)
+        GRBfreeenv(*pBenv);
+    if (solArray != NULL)
+        free(solArray);
 }
 
 void getNumOfVars(sudokoBoard *board, int *pNumOfVars) {

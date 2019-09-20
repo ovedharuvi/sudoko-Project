@@ -746,7 +746,6 @@ StatusType is_game_over(sudokoBoard *board_ptr) {
     }
 
     void exit_game(sudokoBoard *board_ptr, int is_exit_program) {
-
         destroyBoard(board_ptr);
         destroyList();
         if (is_exit_program == TRUE) {
