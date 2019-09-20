@@ -157,6 +157,9 @@ int numOfSolutions(sudokoBoard *board) {
                 numOfSol++;
                 workingBoard->board[currentRow][currentColumn].value = 0;
                 Pop(iterationStack);
+                if(currentRow == firstDynamicCellRow && currentColumn == firstDynamicCellColumn){
+                    break;
+                }
             } else {
                 Push(iterationStack, nextRow, nextColumn);
             }
