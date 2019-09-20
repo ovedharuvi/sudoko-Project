@@ -21,6 +21,7 @@ int main() {
         }
     }
     exit_game(*p_board, TRUE);/*function that releases everything*/
+
     free(p_board);
     return 0;
 }

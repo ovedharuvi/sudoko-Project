@@ -367,7 +367,6 @@ StatusType is_game_over(sudokoBoard *board_ptr) {
         maintain_erroneous(i, j, value, *board);
         print_board_cmd(paramsArray, board, p_mode, paramNum);
 
-        /*checks if game over in SOLVE MODE*/
 
 
         return TRUE;
