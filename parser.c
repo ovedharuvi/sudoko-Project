@@ -67,7 +67,7 @@ StatusType get_line(
         char *pString) {/*returns FALSE if the user entered more than 256 characters, TRUE if valid 256 characters, EXIT if exit by the user*/
     int c = 0, i = 0;
     StatusType status;
-    printf("Please enter a command:");
+    printf("Please enter a command: ");
     while (1) {
         c = getchar();
 
@@ -169,7 +169,8 @@ int get_params(char *text, char **paramsArray) {
 StatusType do_order(CmdInfo cmdInfo, MODE *p_mode, int paramNum, char **paramsArray, sudokoBoard **p_board) {
     StatusType status;
 
-    status = cmdInfo.fun_ptr(paramsArray, p_board, p_mode, paramNum);
+   cmdInfo.fun_ptr(paramsArray, p_board, p_mode, paramNum);
+    status = check_game_over(*p_mode, *p_board,cmdInfo );
     return status;
 }
 
