@@ -33,10 +33,11 @@ StatusType check_valid_params(char *paramArray[], CmdInfo cmdInfo) {
     ParamType paramType;
     int param_num = cmdInfo.paramNum;
 
+
     for (i = 0; i < param_num; i++) {
         /* %n returns the number of bytes consumed by sscanf, so if cast to int of strlen equal to n
          * it means that there no bytes left after %d */
-        if ((sscanf(paramArray[i], "%d%n", &t, &n)) == 1 && n == (int) strlen(paramArray[i])) {
+        if ((sscanf(paramArray[i], "%d%n", &t, &n)) == 1 && n == 0) {
             paramType = Integer;
 
         } else if (sscanf(paramArray[i], "%f", &f) == 1) {
