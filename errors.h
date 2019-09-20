@@ -1,6 +1,6 @@
 
 #include <stdio.h>
-#include "def.c"
+#include "def.h"
 
 
 #ifndef SUDOKOPROJECT_ERRORS_H
