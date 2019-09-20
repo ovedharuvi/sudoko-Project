@@ -1,4 +1,5 @@
 
+#include <stdlib.h>
 #include "errors.h"
 StatusType error_message(ErrorType errorType, CmdInfo cmdInfo) {
     char str[TEXT_SIZE];
@@ -65,4 +66,13 @@ StatusType error_message(ErrorType errorType, CmdInfo cmdInfo) {
     }
 
     return FALSE;
+}
+
+
+
+void myFree(void *pointer) {
+    if (pointer!= NULL){
+        free(pointer);
+    }
+
 }

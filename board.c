@@ -116,6 +116,8 @@ StatusType checkIfValid(sudokoBoard *board, int value, int row, int column, int 
     valid = valid && checkIfValid_ROW(board, value, row, column, to_mark_error);
     if(valid)
         return TRUE;
+    if (to_mark_error)
+        board->board[row][column].is_erroneus = 1;
     return FALSE;
 }
 
