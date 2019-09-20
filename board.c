@@ -172,22 +172,21 @@ void print_dashes(sudokoBoard *board) {
 void printCell(int valueToPrint, cell cellToPrint, int mark_errors,
                int mark_fixed) {    /*print 4 digits - space , number(2 digits) , dot asterisk or space according to cell data*/
 
-    char sayfa = ' ';
     printf(" ");
     (valueToPrint == 0) ? printf(BLANK_SPACE) : printf("%2d", valueToPrint);
     if (mark_fixed == 1) {
-        if(cellToPrint.is_fixed)
-            sayfa = '.';
-        else
-            sayfa = ' ';
+        if(cellToPrint.is_fixed){
+            printf(".");
+            return;
+        }
     }
     if (mark_errors == 1) {
-        if(cellToPrint.is_erroneus)
-            sayfa = '*';
-        else
-            sayfa = ' ';
+        if(cellToPrint.is_erroneus){
+            printf("*");
+            return;
+        }
     }
-    printf("%c", sayfa);
+    printf(" ");
 }
 
 
