@@ -514,8 +514,8 @@ StatusType redo_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, int p
         case GUESS:
             do_set_by_action(*action_ptr, *board, FALSE);
             while (action_ptr->insertedByComputer == TRUE) {
-                do_set_by_action(*action_ptr, *board, FALSE);
                 action_ptr = listRedo();
+                do_set_by_action(*action_ptr, *board, FALSE);
             }
             break;
         case SET:
