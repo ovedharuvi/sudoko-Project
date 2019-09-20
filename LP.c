@@ -281,6 +281,9 @@ int gurobi(sudokoBoard *sudokoBoard, float threshold, CmdType command, int guess
 #endif
         goto QUIT;
     }
+    if(solStatus != GRB_OPTIMAL){
+        goto QUIT;
+    }
 
     error = GRBgetdblattr(model, GRB_DBL_ATTR_OBJVAL, &objVal);
     if (error) {
@@ -311,7 +314,7 @@ int gurobi(sudokoBoard *sudokoBoard, float threshold, CmdType command, int guess
         return error_message(gurobi_error, CmdArray[VALIDATE]);
     if (solStatus == GRB_OPTIMAL)
         return TRUE;
-    if (solStatus == GRB_INF_OR_UNBD)
+    if (solStatus == GRB_INFEASIBLE)
         return FALSE;
     else {
         return error_message(gurobi_error, CmdArray[VALIDATE]);
