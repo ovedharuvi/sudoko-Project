@@ -5,7 +5,7 @@ StatusType error_message(ErrorType errorType, CmdInfo cmdInfo) {
     char * ptoken = str;
 
     switch(errorType){
-        case line_limit : printf("Error.You have entered over 256 characters.\n please enter a valid command :\n");break;
+        case line_limit : printf("Error. You have entered over 256 characters.\n please enter a valid command :\n");break;
         case invalid_cmd : printf("Error. Invalid Command.\n");break;
         case invalid_mode :
             switch (cmdInfo.mode){
@@ -14,10 +14,10 @@ StatusType error_message(ErrorType errorType, CmdInfo cmdInfo) {
                 case INIT_MODE: break;
                 default: ptoken = "edit and solve modes"; break;
             }
-            printf("Error.Invalid MODE for This Command. The Command %s is available on %s only.\n",cmdInfo.cmdName,ptoken);
+            printf("Error. Invalid MODE for This Command. The Command %s is available on %s only.\n",cmdInfo.cmdName,ptoken);
             break;
         case invalid_param_num :
-            printf("Error.Invalid Numbers of Parameters for This Command.The Command %s needs %d Parameters.\n"
+            printf("Error. Invalid Numbers of Parameters for This Command.\nThe Command %s needs %d Parameters.\n"
                     ,cmdInfo.cmdName,cmdInfo.paramNum);
             break;
         case invalid_param_type :
@@ -29,11 +29,11 @@ StatusType error_message(ErrorType errorType, CmdInfo cmdInfo) {
                 default:break;
             }
 
-            printf("Error.Invalid Type of Parameters for This Command.The Command %s needs Parameters in Type of %s\n."
+            printf("Error. Invalid Type of Parameters for This Command.\nThe Command %s needs Parameters in Type of %s\n."
                     ,cmdInfo.cmdName,ptoken);
             break;
         case board_erroneous:
-            printf("Error.Invalid board for This Command.The Command %s needs board without errors in this MODE.\n",cmdInfo.cmdName ) ;
+            printf("Error. Invalid board for This Command.\nThe Command %s needs board without errors in this MODE.\n",cmdInfo.cmdName ) ;
             break;
 
         case incorrect_range:

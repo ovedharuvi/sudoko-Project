@@ -28,8 +28,9 @@ str_compare(const char *first, char *second);/*returns 0 if the second string is
 /*void string_to_array(char textPtr[256], char *string, int size);*/
 
 StatusType check_valid_params(char *paramArray[], CmdInfo cmdInfo) {
-    int i, n, t;
-    float f;
+    int i, t, m;
+    char n;
+    int f;
     ParamType paramType;
     int param_num = cmdInfo.paramNum;
 
@@ -37,10 +38,10 @@ StatusType check_valid_params(char *paramArray[], CmdInfo cmdInfo) {
     for (i = 0; i < param_num; i++) {
         /* %n returns the number of bytes consumed by sscanf, so if cast to int of strlen equal to n
          * it means that there no bytes left after %d */
-        if ((sscanf(paramArray[i], "%d%n", &t, &n)) == 1 && n == 0) {
+        if ((sscanf(paramArray[i], "%d%c", &t, &n) == 1) && (sscanf(paramArray[i], "%d", &t) == 1)) {
             paramType = Integer;
 
-        } else if (sscanf(paramArray[i], "%f", &f) == 1) {
+        } else if (sscanf(paramArray[i], "%d%c%d", &f, &n, &m) == 3 && (n == '.')) {
             paramType = Float;
         } else paramType = String;
 
@@ -67,22 +68,17 @@ StatusType get_line(
     int c = 0, i = 0;
     StatusType status;
     printf("Please enter a command:");
-        while (1) {
+    while (1) {
         c = getchar();
 
 
         if (c == '\n') {/*command ends with enter from stdin*/
-            status =  TRUE;
+            status = TRUE;
             break;
-        }
-
-        else if (c == EOF) {
-            status =  EXIT;
+        } else if (c == EOF) {
+            status = EXIT;
             break;
-        }
-
-
-        else if (i == BUFFERSIZE) {
+        } else if (i == BUFFERSIZE) {
             fflush(stdin);
             return error_message(line_limit, CmdArray[EDIT]);
         }
@@ -92,8 +88,8 @@ StatusType get_line(
         i++;
 
     }
-        fflush(stdin);
-        return status;
+    fflush(stdin);
+    return status;
 }
 
 
@@ -115,6 +111,7 @@ StatusType get_cmd(char *text, CmdInfo *cmdArray) {
     }
     return (int) INVALID;
 }
+
 /*
 void string_to_array(char textPtr[256], char *string, int size) {
     int i;
@@ -126,19 +123,19 @@ void string_to_array(char textPtr[256], char *string, int size) {
 StatusType get_mode(int index, MODE Mode) {
     /*SOLVE = 0,EDIT = 1,MARK = 2, PRINT = 3, SET = 4, VALIDATE = 5, GUESS = 6, GENERATE = 7, UNDO = 8,
      REDO = 9, SAVE = 10, HINT = 11, GUESS_H = 12, NUM_S = 13, AUTOFILL = 14, RESET = 15, EXIT_GAME = 16, INVALID =17}CmdType*/
-    if ((CmdArray[index].mode) == SOLVE_MODE+EDIT_MODE+INIT_MODE){
+    if ((CmdArray[index].mode) == SOLVE_MODE + EDIT_MODE + INIT_MODE) {
         return TRUE;
     }
 
-    if ((CmdArray[index].mode) == Mode){
+    if ((CmdArray[index].mode) == Mode) {
         return TRUE;
     }
 
-    if (CmdArray[index].mode == Mode + EDIT_MODE){
+    if (CmdArray[index].mode == Mode + EDIT_MODE) {
         return TRUE;
     }
 
-    if (CmdArray[index].mode == Mode + SOLVE_MODE){
+    if (CmdArray[index].mode == Mode + SOLVE_MODE) {
         return TRUE;
     }
     return FALSE;
@@ -157,14 +154,14 @@ int get_params(char *text, char **paramsArray) {
         if (ptoken == NULL) {
             break;
         }
-            paramsArray[i] = ptoken;
-            result++;
-            i++;
-            if (*text =='\0'){
-                break;
-            }
-
+        paramsArray[i] = ptoken;
+        result++;
+        i++;
+        if (*text == '\0') {
+            break;
         }
+
+    }
 
     return result;
 }
