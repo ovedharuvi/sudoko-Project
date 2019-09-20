@@ -678,9 +678,9 @@ StatusType is_game_over(sudokoBoard *board_ptr) {
                 }
             }
         }
-        if (copy) {
+
             destroyBoard(copy);
-        }
+
         if (statusArray) {
             free(statusArray);
         }
