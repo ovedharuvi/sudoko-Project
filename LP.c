@@ -77,8 +77,8 @@ int gurobi(sudokoBoard *sudokoBoard, float threshold, CmdType command, int guess
     /*Allocating mamory*/
     obj = (double *) malloc(sizeof(double) * numOfVars);
     vtype = (char *) malloc(sizeof(char) * numOfVars);
-    map = (int *) malloc(3 * sizeof(int) *
-                         numOfVars); /*Mapping the varibles --- each variable mapped to 3 cells (row,column,value)*/
+    /*Mapping the varibles --- each variable mapped to 3 cells (row,column,value)*/
+    map = (int *) malloc(3 * sizeof(int) *numOfVars);
     sol = (double *) malloc(sizeof(double) * numOfVars);
     ind = (int *) malloc(sizeof(int) * boardSize);
     val = (double *) malloc(sizeof(double) * boardSize);
@@ -160,6 +160,8 @@ int gurobi(sudokoBoard *sudokoBoard, float threshold, CmdType command, int guess
             val[k] = 1.0;
             k++;
             i++;
+            if(i == numOfVars)
+                break;
         }
         if (k > 0)
             error = GRBaddconstr(model, k, ind, val, GRB_EQUAL,
@@ -366,6 +368,7 @@ int actByCommand(sudokoBoard *board, double *solArray, int *mapArray, CmdType co
             if (i == numOfCoefficients)
                 break;
         }
+        free(potentialValues);
         return TRUE;
     }
 
@@ -381,7 +384,7 @@ int actByCommand(sudokoBoard *board, double *solArray, int *mapArray, CmdType co
                 printf("\tScore of %d is %f\n", mapArray[MAP_VALUE(i)], solArray[i]);
             }
             i++;
-            if (i > numOfCoefficients)
+            if (i == numOfCoefficients)
                 break;
         }
         return TRUE;
