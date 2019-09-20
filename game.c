@@ -1,15 +1,16 @@
 
-/*#include <fvec.h>*/
 #include "game.h"
 
 /*returns TRUE if the row,column and value in the correct range of the board */
 StatusType check_range(int row, int column, int value, int size);
 
-/* */
+/* in order to do undo or redo , execute the set order according to a given action from the doubly linked list  */
 void do_set_by_action(ACTION action, sudokoBoard *board, int is_undo);
 
+/* maintain the cells field "is_erroneous" calling checkIfValid*/
 void maintain_erroneous(int row, int column, int value, sudokoBoard *board);
 
+/* fills a boolean array in the board size that represents if it's possible to put the value i of a given cell. */
 void fill_legal_values(int row, int column, sudokoBoard *board, StatusType *array);
 
 int check_single_solution(StatusType *array, int boardSize);
@@ -321,7 +322,7 @@ StatusType set_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, int pa
     return status;
 }
 
-/* maintain the cells field "is_erroneous*/
+
 void maintain_erroneous(int row, int column, int value, sudokoBoard *board) {
     checkIfValid(board, value, row, column, TRUE);
 
