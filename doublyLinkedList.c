@@ -24,7 +24,7 @@ struct Node* createNode(int oldValue , int newValue , int row , int column ,int 
 void InsertAction (int oldValue , int newValue, int row , int column , int insertedByComputer , CmdType command) {
     struct Node* newNode = createNode(oldValue , newValue , row, column, insertedByComputer, command);
     if(newNode == NULL)
-        printf("Error")
+        printf("Error. memory error.\n");
     if(head == NULL){                               /*check if this is the first action (new list)*/
         head = newNode;
         tail = newNode;
