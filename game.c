@@ -24,7 +24,8 @@ void fill_legal_values(int row, int column, sudokoBoard *board, StatusType *arra
  * return value: 1 if true, else 0. */
 int check_single_solution(StatusType *array, int boardSize);
 
-/* fill_board*/
+/* fill_board is a function inside load function.
+ * according to the file format parameters fill_*/
 StatusType fill_board(sudokoBoard **boardPtr, char *pString);
 
 StatusType solve_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode,
@@ -78,7 +79,7 @@ StatusType exit_program_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mod
 void SetCmdArray(); /*initialize Command Array*/
 sudokoBoard *load(char *path);/*case when edit with no params load gets NULL and generates 9*9 board*/
 StatusType is_game_over(sudokoBoard *board_ptr); /*returns TRUE if all board is filled else FALSE*/
-void exit_game(sudokoBoard *board_ptr, int is_exit_program);
+
 
 CmdInfo CmdArray[ORDERS_NUM];
 int MarkErrors;
