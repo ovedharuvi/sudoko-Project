@@ -83,14 +83,16 @@ void make_board_equal(sudokoBoard *board_ptr, sudokoBoard *copy, CmdType cmdType
 
     n = board_ptr->boardSize;
     for (i = 0; i < n; i++) {
-        oldValue = board_ptr->board[i][j].value;
-        newValue = copy->board[i][j].value;
-        if (oldValue != newValue) {
-            board_ptr->board[i][j].value = newValue;
-            InsertAction(oldValue, newValue, i, j, TRUE, cmdType);
+        for (j = 0; j < n; j++) {
+            oldValue = board_ptr->board[i][j].value;
+            newValue = copy->board[i][j].value;
+            if (oldValue != newValue) {
+                board_ptr->board[i][j].value = newValue;
+                InsertAction(oldValue, newValue, i, j, TRUE, cmdType);
+            }
         }
-    }
 
+    }
 }
 
 sudokoBoard *load(char *path) {
@@ -337,7 +339,7 @@ StatusType validate_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, i
     UNUSED (p_mode);
 
     result = validate(*board);
-    printf(result ? "The board is solvable." : "The board is unsolvable." );
+    printf(result ? "The board is solvable.\n" : "The board is unsolvable." );
     return FALSE;
 }
 
@@ -360,7 +362,7 @@ StatusType guess_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, int 
     if (copy == *board){
         return error_message(unsolvable_board,CmdArray[GUESS]);
     }
-    if (copy == *board) {
+    if (copy == NULL) {
         return error_message(memory_error, CmdArray[GUESS]);
     }
     make_board_equal(*board, copy, GUESS);
@@ -388,7 +390,7 @@ StatusType generate_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, i
     if (copy == *board){
         return error_message(unsolvable_board,CmdArray[GENERATE]);
     }
-    if (copy == *board){
+    if (copy == NULL){
         return error_message(memory_error,CmdArray[GENERATE]);
     }
     make_board_equal(*board, copy, GENERATE);
