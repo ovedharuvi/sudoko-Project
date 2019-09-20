@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include "gurobi_c.h"
 #include "errors.h"
-#include "cmdType.h"
+#include "cmdType.c"
 #ifndef SUDOKOPROJECT_LP_H
 #define SUDOKOPROJECT_LP_H
 /*--------- LP MODULE ----------
