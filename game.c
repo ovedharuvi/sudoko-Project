@@ -265,10 +265,9 @@ StatusType solve_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, int 
 
 
     /*start over board and doubly linked list in case they are initialized*/
-    if (*board != NULL) {
-        destroyBoard(*board);
-    }
-    destroyList();/*maintain the doublylinkedlist*/
+
+    destroyBoard(*board);
+        destroyList();/*maintain the doublylinkedlist*/
     *board = newBoard;
     print_board_cmd(paramsArray, board, p_mode, paramNum);
 
@@ -289,9 +288,7 @@ StatusType edit_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, int p
     *p_mode = EDIT_MODE;
 
     /*start over board and doubly linked list in case they are initialized*/
-    if (*board != NULL) {
-        destroyBoard(*board);
-    }
+    destroyBoard(*board);
     destroyList();/*maintain the doublylinkedlist*/
 
     *board = newBoard;
@@ -721,9 +718,8 @@ StatusType check_range(int row, int column, int value, int size) {
 }
 
 void exit_game(sudokoBoard *board_ptr, int is_exit_program) {
-    if (board_ptr != NULL) {
-        destroyBoard(board_ptr);
-    }
+
+    destroyBoard(board_ptr);
     destroyList();
     if (is_exit_program == TRUE) {
         printf("Exiting...\n");
