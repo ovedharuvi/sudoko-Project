@@ -819,6 +819,7 @@ void maintain_erroneous(sudokoBoard *board) {
     for (i = 0 ; i < n; i++){
         for(j = 0 ; j < n ; j++){
             if (board->board[i][j].value == 0){
+                board->board[i][j].is_erroneus = 0;
                 continue;
             }
             status = checkIfValid(board,board->board[i][j].value,i,j);
