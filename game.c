@@ -1,20 +1,30 @@
 
 #include "game.h"
 
-/*returns TRUE if the row,column and value in the correct range of the board */
+/*check_range checks if the parameters given in set command are valid to the current board.
+ * return value : statusType. returns TRUE if the row,column and value in the correct range of the board.
+*/
 StatusType check_range(int row, int column, int value, int size);
 
-/* in order to do undo or redo , execute the set order according to a given action from the doubly linked list  */
+/* do_set_by_action  executes the set order according to a given action from the doubly linked list.
+ * no return value.
+ * parameters : is_undo- True if undo command FALSE if redo command. */
 void do_set_by_action(ACTION action, sudokoBoard *board, int is_undo);
 
-/* maintain the cells field "is_erroneous" calling checkIfValid*/
+/* maintain_erroneous maintains the cells field "is_erroneous".
+ * calling checkIfValid
+ * parameters : row column and value describes the set order that had happened and needs to be checked.*/
 void maintain_erroneous(int row, int column, int value, sudokoBoard *board);
 
-/* fills a boolean array in the board size that represents if it's possible to put the value i of a given cell. */
+/* fill_legal_values fills an array in the size of the board that represents if it's legal
+ * to put the value i of a given cell. in place i there is representation of the value i+1. */
 void fill_legal_values(int row, int column, sudokoBoard *board, StatusType *array);
 
+/*checks if in a boolean array only one cell is set to 1
+ * return value: 1 if true, else 0. */
 int check_single_solution(StatusType *array, int boardSize);
 
+/* fill_board*/
 StatusType fill_board(sudokoBoard **boardPtr, char *pString);
 
 StatusType solve_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode,
@@ -64,6 +74,11 @@ StatusType reset_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, int 
 StatusType exit_program_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, int paramNum);
 
 /*releases memory by destroyBoard from solver, destroylist ? . prints exit message.*/
+
+void SetCmdArray(); /*initialize Command Array*/
+sudokoBoard *load(char *path);/*case when edit with no params load gets NULL and generates 9*9 board*/
+StatusType is_game_over(sudokoBoard *board_ptr); /*returns TRUE if all board is filled else FALSE*/
+void exit_game(sudokoBoard *board_ptr, int is_exit_program);
 
 CmdInfo CmdArray[ORDERS_NUM];
 int MarkErrors;
@@ -127,7 +142,10 @@ CmdInfo Reset_Game ={&reset_cmd, EDIT_MODE + SOLVE_MODE, 0, None, "reset"};
 CmdInfo Exit ={&exit_program_cmd, INIT_MODE + EDIT_MODE + SOLVE_MODE, 0, None, "exit"};
 */
 void make_board_equal(sudokoBoard *board_ptr, sudokoBoard *copy, CmdType cmdType) {
-    int i, j = 0, n, oldValue, newValue;
+    int i, j , n, oldValue, newValue;
+    int first_insert;
+
+    first_insert =1;
 
     n = board_ptr->boardSize;
     for (i = 0; i < n; i++) {
@@ -136,7 +154,8 @@ void make_board_equal(sudokoBoard *board_ptr, sudokoBoard *copy, CmdType cmdType
             newValue = copy->board[i][j].value;
             if (oldValue != newValue) {
                 board_ptr->board[i][j].value = newValue;
-                InsertAction(oldValue, newValue, i, j, TRUE, cmdType);
+                InsertAction(oldValue, newValue, i, j, first_insert ? FALSE : TRUE, cmdType);
+                first_insert = 0;
             }
         }
 
