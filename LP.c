@@ -3,7 +3,7 @@
 
 #include "LP.h"
 
-#define DEBUG
+
 #define MAP_ROW(x) 3*(x)
 #define MAP_COLUMN(x) 3*(x)+1
 #define MAP_VALUE(x) 3*(x)+2
@@ -53,10 +53,6 @@ void freeAllocatedMem(double *objArray, char *vtype, int *mapArray, int *indArra
                       GRBenv **pBenv, double *solArray);
 
 
-
-
-
-
 int gurobi(sudokoBoard *sudokoBoard, float threshold, CmdType command, int guessHintRow, int guessHintColumn) {
     /*Declaration of local variables and GRB variables*/
     int numOfVars, i, j, v, k, currentRow, currentColumn, binary;
@@ -104,7 +100,7 @@ int gurobi(sudokoBoard *sudokoBoard, float threshold, CmdType command, int guess
 
 
     error = GRBsetintparam(env, GRB_INT_PAR_LOGTOCONSOLE, 0);
-    error |= GRBsetintparam(env , GRB_INT_PAR_OUTPUTFLAG , 0);
+    error |= GRBsetintparam(env, GRB_INT_PAR_OUTPUTFLAG, 0);
     if (error) {
 #ifdef DEBUG
         printf("ERROR %d GRBsetintattr(): %s\n", error, GRBgeterrormsg(env));
@@ -128,7 +124,7 @@ int gurobi(sudokoBoard *sudokoBoard, float threshold, CmdType command, int guess
             obj[i] = 1;
         } else {
             vtype[i] = GRB_CONTINUOUS;
-            obj[i] = rand() % (boardSize*boardSize);
+            obj[i] = rand() % (boardSize * boardSize);
         }
     }
 
@@ -163,9 +159,9 @@ int gurobi(sudokoBoard *sudokoBoard, float threshold, CmdType command, int guess
             k++;
             i++;
         }
-
-        error = GRBaddconstr(model, k, ind, val, GRB_EQUAL,
-                             1.0, NULL);
+        if (k > 0)
+            error = GRBaddconstr(model, k, ind, val, GRB_EQUAL,
+                                 1.0, NULL);
 
         if (error) {
 #ifdef DEBUG
@@ -281,7 +277,7 @@ int gurobi(sudokoBoard *sudokoBoard, float threshold, CmdType command, int guess
 #endif
         goto QUIT;
     }
-    if(solStatus != GRB_OPTIMAL){
+    if (solStatus != GRB_OPTIMAL) {
         goto QUIT;
     }
 
@@ -324,8 +320,6 @@ int gurobi(sudokoBoard *sudokoBoard, float threshold, CmdType command, int guess
 }
 
 
-
-
 /*Implementation of static funcitons*/
 
 int actByCommand(sudokoBoard *board, double *solArray, int *mapArray, CmdType command, double threshhold,
@@ -350,7 +344,7 @@ int actByCommand(sudokoBoard *board, double *solArray, int *mapArray, CmdType co
             currentColumn = mapArray[MAP_COLUMN(i)];
             currentRow = mapArray[MAP_ROW(i)];
 
-            while (mapArray[MAP_ROW(i)] == currentRow && mapArray[MAP_COLUMN(i)]  == currentColumn) {
+            while (mapArray[MAP_ROW(i)] == currentRow && mapArray[MAP_COLUMN(i)] == currentColumn) {
                 if (checkIfValid(board, mapArray[MAP_VALUE(i)], currentRow, currentColumn, FALSE) &&
                     solArray[i] > threshhold) {
                     potentialValues[k] = (float) mapArray[MAP_VALUE(i)];
@@ -376,7 +370,7 @@ int actByCommand(sudokoBoard *board, double *solArray, int *mapArray, CmdType co
 
     if (command == GUESS_H) {
         i = 0;
-        printf("Value score for cell %d %d:\n" , guessHintColumn , guessHintRow);
+        printf("Value score for cell %d %d:\n", guessHintColumn +1, guessHintRow+1);
         while (mapArray[MAP_ROW(i)] != guessHintRow || mapArray[MAP_COLUMN(i)] != guessHintColumn) {
             i++;
         }
