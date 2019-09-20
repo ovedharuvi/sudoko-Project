@@ -23,6 +23,8 @@ struct Node* createNode(int oldValue , int newValue , int row , int column ,int 
 /*Public functions implementation*/
 void InsertAction (int oldValue , int newValue, int row , int column , int insertedByComputer , CmdType command) {
     struct Node* newNode = createNode(oldValue , newValue , row, column, insertedByComputer, command);
+    if(newNode == NULL)
+        printf("Error")
     if(head == NULL){                               /*check if this is the first action (new list)*/
         head = newNode;
         tail = newNode;
@@ -74,18 +76,19 @@ ACTION* listRedo(){
 
 void destroyList(){
 
-    struct Node* temp = tail;
+    struct Node* temp;
     if (head == NULL){
         return;
     }
-    if(temp == NULL){
-        return;
-    }
+    temp = tail;
     while(temp != head){
         temp = temp->prev;
         free(temp->next->action);
         free(temp->next);
     }
+    head=NULL;
+    tail=NULL;
+    currentAction=NULL;
     free(temp->action);
     free(temp);
 
@@ -98,6 +101,8 @@ void destroyList(){
 
 ACTION* createAction(int oldValue , int newValue, int row, int column, int insertedByComputer , CmdType command){
     ACTION* action = (ACTION*)malloc(sizeof(ACTION));
+    if(action == NULL)
+        return NULL;
     action->oldValue = oldValue;
     action->newValue = newValue;
     action->row = row;
@@ -110,7 +115,11 @@ ACTION* createAction(int oldValue , int newValue, int row, int column, int inser
 
 struct Node* createNode(int oldValue , int newValue , int row , int column ,int insertedByComputer, CmdType command ){
     struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    if(newNode == NULL)
+        return NULL;
     newNode->action = createAction(oldValue , newValue , row , column , insertedByComputer, command);
+    if(newNode->action == NULL)
+        return NULL;
     newNode->prev = NULL;
     newNode->next = NULL;
     return newNode;
