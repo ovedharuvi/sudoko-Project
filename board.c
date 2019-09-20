@@ -183,7 +183,7 @@ void printCell(int valueToPrint, cell cellToPrint, int mark_errors,
     }
     if (mark_errors == 1) {
         if(cellToPrint.is_erroneus)
-            sayfa = '.';
+            sayfa = '*';
         else
             sayfa = ' ';
     }
