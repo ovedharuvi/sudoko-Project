@@ -49,8 +49,9 @@
  *
  *
  *                  */
-void init_game();  /*initialize the command array and sends welcome message*/
+void init_game();  /*sends welcome message*/
 void exit_game(sudokoBoard *board_ptr, int is_exit_program);
+void SetCmdArray(); /*initialize Command Array*/
 StatusType check_game_over(sudokoBoard *board, CmdInfo cmdInfo);
 extern int MarkErrors;
 #endif

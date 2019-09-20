@@ -77,7 +77,7 @@ StatusType exit_program_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mod
 
 /*releases memory by destroyBoard from solver, destroylist ? . prints exit message.*/
 
-void SetCmdArray(); /*initialize Command Array*/
+
 sudokoBoard *load(char *path);/*case when edit with no params load gets NULL and generates 9*9 board*/
 StatusType is_game_over(sudokoBoard *board_ptr); /*returns TRUE if all board is filled else FALSE*/
 
@@ -89,7 +89,6 @@ int MarkErrors;
 
 void init_game() {
     MarkErrors = TRUE; /*global variable set to TRUE on INIT mode*/
-    SetCmdArray();/* init the CMD Array*/
     printf("Welcome to Sudoku Game !\n To initialize new board you can enter 'edit'.\n"
            "To load a game you can enter 'edit' or 'solve' and then the path of your board.\n");
 
@@ -139,6 +138,7 @@ void make_board_equal(sudokoBoard *board_ptr, sudokoBoard *copy, CmdType cmdType
             newValue = copy->board[i][j].value;
             if (oldValue != newValue) {
                 board_ptr->board[i][j].value = newValue;
+                maintain_erroneous(i, j, newValue, board_ptr);
                 InsertAction(oldValue, newValue, i, j, first_insert ? FALSE : TRUE, cmdType);
                 first_insert = 0;
             }
@@ -225,6 +225,7 @@ StatusType fill_board(sudokoBoard **boardPtr, char *pString) {
             status = sscanf(ptoken, "%d%c", &value, &dot);
             if (status > 0) {
                 newBoard->board[i][j].value = value;
+                maintain_erroneous(i, j, value, *boardPtr);
                 result++;
                 if (status == 2) {
                     newBoard->board[i][j].is_fixed = TRUE;
@@ -353,13 +354,14 @@ StatusType is_game_over(sudokoBoard *board_ptr) {
             return error_message(fixed_cell, CmdArray[SET]);
         }
 
-        maintain_erroneous(i, j, value, *board);
+
 
         /*maintain doubly linked list*/
         InsertAction((*board)->board[i][j].value, value, i, j, FALSE, SET);
 
         /*Set action itself*/
         (*board)->board[i][j].value = value;
+        maintain_erroneous(i, j, value, *board);
         print_board_cmd(paramsArray, board, p_mode, paramNum);
 
         /*checks if game over in SOLVE MODE*/
@@ -381,7 +383,7 @@ StatusType is_game_over(sudokoBoard *board_ptr) {
             return error_message(board_erroneous, cmdInfo);/*return error of erroneous*/
         } else {
             printf("Congratulations !!! You solved the board! \n");
-            exit_game(board, FALSE);/*Free everything and not exiting program*/
+
 
         }
         return TRUE;
@@ -500,6 +502,7 @@ StatusType is_game_over(sudokoBoard *board_ptr) {
             value = action.newValue;
         }
         board->board[i][j].value = value;
+        maintain_erroneous(i, j, value, board);
 
     }
 
@@ -667,6 +670,7 @@ StatusType is_game_over(sudokoBoard *board_ptr) {
                     InsertAction((*board)->board[i][j].value, value, i, j, (firstInsert ? FALSE : TRUE), AUTOFILL);
                     firstInsert = 0;                                                   /*maintain doubly linked list*/
                     (*board)->board[i][j].value = value;
+                    maintain_erroneous(i, j, value, *board);
 
                 }
             }

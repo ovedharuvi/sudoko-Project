@@ -9,7 +9,7 @@ int main() {
     p_board = (sudokoBoard **) malloc(sizeof(sudokoBoard *));
 
     prog_stat = TRUE;
-
+    SetCmdArray();/* init the CMD Array*/
     while (prog_stat!=EXIT) {/*program is not over*/
         mode = INIT_MODE;
         init_game();
