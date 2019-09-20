@@ -169,15 +169,22 @@ int get_params(char *text, char **paramsArray) {
 StatusType do_order(CmdInfo cmdInfo, MODE *p_mode, int paramNum, char **paramsArray, sudokoBoard **p_board) {
     StatusType status;
 
+/* the order execution*/
    status = cmdInfo.fun_ptr(paramsArray, p_board, p_mode, paramNum);
+   /* leaves only the orderd that changed something in the board*/
    if (status != TRUE){
        return status;
    }
+
+   /* maintain erroneous filed of each cell in the board*/
+    maintain_erroneous(*p_board);
 
     /* updates that game is over only in solve mode*/
     if (*p_mode != SOLVE_MODE) {
         return FALSE;
     }
+
+    /*check if game is over*/
     status = check_game_over(*p_board, cmdInfo);
     return status;
 }

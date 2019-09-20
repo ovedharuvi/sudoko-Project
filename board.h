@@ -64,6 +64,6 @@ void destroyBoard(sudokoBoard *board);
 void printBoard(int whatToPrint, sudokoBoard *sudokoBoard, int mark_errors, int mark_fixed);            /*what to print = 0 --> print cell value
  *                                                                        what to print = 1 --> print cell solution value*/
 
-StatusType checkIfValid(sudokoBoard *board, int value, int row, int column, int to_mark_error);
+StatusType checkIfValid(sudokoBoard *board, int value, int row, int column);
 StatusType is_erroneous(sudokoBoard * board);
 #endif

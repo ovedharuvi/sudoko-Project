@@ -1,6 +1,7 @@
 
 #include "game.h"
 
+
 /*check_range checks if the parameters given in set command are valid to the current board.
  * return value : statusType. returns TRUE if the row,column and value in the correct range of the board.
 */
@@ -10,11 +11,6 @@ StatusType check_range(int row, int column, int value, int size);
  * no return value.
  * parameters : is_undo- True if undo command FALSE if redo command. */
 void do_set_by_action(ACTION action, sudokoBoard *board, int is_undo);
-
-/* maintain_erroneous maintains the cells field "is_erroneous".
- * calling checkIfValid
- * parameters : row column and value describes the set order that had happened and needs to be checked.*/
-void maintain_erroneous(int row, int column, int value, sudokoBoard *board);
 
 /* fill_legal_values fills an array in the size of the board that represents if it's legal
  * to put the value i of a given cell. in place i there is representation of the value i+1. */
@@ -177,7 +173,6 @@ void make_board_equal(sudokoBoard *board_ptr, sudokoBoard *copy, CmdType cmdType
             newValue = copy->board[i][j].value;
             if (oldValue != newValue) {
                 board_ptr->board[i][j].value = newValue;
-                maintain_erroneous(i, j, newValue, board_ptr);
                 InsertAction(oldValue, newValue, i, j, first_insert ? FALSE : TRUE, cmdType);
                 first_insert = 0;
             }
@@ -264,10 +259,15 @@ StatusType fill_board(sudokoBoard **boardPtr, char *pString) {
 
             status = sscanf(ptoken, "%d%c", &value, &dot);
             if (status > 0) {
+                if(check_range(i,j,value,n)== FALSE){
+                    return FALSE;
+                }
                 newBoard->board[i][j].value = value;
-                maintain_erroneous(i, j, value, newBoard);
                 result++;
                 if (status == 2) {
+                    if (dot != '.'){
+                        return FALSE;
+                    }
                     newBoard->board[i][j].is_fixed = TRUE;
                 }
             }
@@ -399,7 +399,6 @@ StatusType set_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, int pa
 
     /*Set action itself*/
     (*board)->board[i][j].value = value;
-    maintain_erroneous(i, j, value, *board);
     print_board_cmd(paramsArray, board, p_mode, paramNum);
 
 
@@ -425,13 +424,6 @@ StatusType check_game_over(sudokoBoard *board, CmdInfo cmdInfo) {
     return TRUE;
 }
 
-
-void maintain_erroneous(int row, int column, int value, sudokoBoard *board) {
-    if (value > 0) {
-        checkIfValid(board, value, row, column, TRUE);
-    }
-
-}
 
 StatusType validate_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, int paramNum) {
     int result;
@@ -542,7 +534,6 @@ void do_set_by_action(ACTION action, sudokoBoard *board, int is_undo) {
         value = action.newValue;
     }
     board->board[i][j].value = value;
-    maintain_erroneous(i, j, value, board);
 
 }
 
@@ -710,7 +701,6 @@ StatusType autofill_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, i
                 InsertAction((*board)->board[i][j].value, value, i, j, (firstInsert ? FALSE : TRUE), AUTOFILL);
                 firstInsert = 0;                                                   /*maintain doubly linked list*/
                 (*board)->board[i][j].value = value;
-                maintain_erroneous(i, j, value, *board);
 
             }
         }
@@ -742,7 +732,7 @@ void fill_legal_values(int row, int column, sudokoBoard *board, StatusType *arra
     int i, n;
     n = board->boardSize;
     for (i = 0; i < n; i++) {
-        array[i] = checkIfValid(board, i + 1, row, column, FALSE);
+        array[i] = checkIfValid(board, i + 1, row, column);
     }
 }
 
@@ -786,5 +776,24 @@ void exit_game(sudokoBoard *board_ptr, int is_exit_program) {
         printf("Exiting...\n");
     }
 
+}
+
+void maintain_erroneous(sudokoBoard *board) {
+    int i,j,n;
+    StatusType status;
+    n = board->boardSize;
+
+
+    for (i = 0 ; i < n; i++){
+        for(j = 0 ; j < n ; j++){
+            status = checkIfValid(board,board->board[i][j].value,i,j);
+            if (status){
+                board->board[i][j].is_erroneus = 0;
+            }
+            else{
+                board->board[i][j].is_erroneus = 1;
+            }
+        }
+    }
 }
 
