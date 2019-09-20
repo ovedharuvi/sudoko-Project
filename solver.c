@@ -219,7 +219,7 @@ StatusType findNextValue(sudokoBoard *board, int row, int column) {
             return FALSE;
         }
         currentCell->value++;
-        if (checkIfValid(board, currentCell->value, row, column, FALSE)) {
+        if (checkIfValid(board, currentCell->value, row, column)) {
             return TRUE;
         }
     }
@@ -353,7 +353,7 @@ int fillCellRandValue(sudokoBoard *board, int row, int column) {
     if (potentialValues == NULL)
         return FALSE;
     for (v = 1; v <= board->boardSize; v++) {
-        if (checkIfValid(board, v, row, column, FALSE)) {
+        if (checkIfValid(board, v, row, column)) {
             potentialValues[numOfPotentialValues] = v;
             numOfPotentialValues++;
         }

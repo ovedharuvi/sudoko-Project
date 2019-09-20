@@ -176,10 +176,16 @@ void printCell(int valueToPrint, cell cellToPrint, int mark_errors,
     printf(" ");
     (valueToPrint == 0) ? printf(BLANK_SPACE) : printf("%2d", valueToPrint);
     if (mark_fixed == 1) {
-        sayfa = cellToPrint.is_fixed ? '.' : ' ';
+        if(cellToPrint.is_fixed)
+            sayfa = '.';
+        else
+            sayfa = ' ';
     }
     if (mark_errors == 1) {
-        sayfa = cellToPrint.is_erroneus ? '*' : ' ';
+        if(cellToPrint.is_erroneus)
+            sayfa = '.';
+        else
+            sayfa = ' ';
     }
     printf("%c", sayfa);
 }
@@ -205,7 +211,6 @@ int checkIfValid_COLUMN(sudokoBoard *board, int value, int row, int column) {
 
     for (i = 0; i < board->boardSize; ++i) {
         if (value == board->board[i][column].value && i != row) {
-
             status = FALSE;
         }
     }

@@ -349,7 +349,7 @@ int actByCommand(sudokoBoard *board, double *solArray, int *mapArray, CmdType co
             currentRow = mapArray[MAP_ROW(i)];
 
             while (mapArray[MAP_ROW(i)] == currentRow && mapArray[MAP_COLUMN(i)] == currentColumn) {
-                if (checkIfValid(board, mapArray[MAP_VALUE(i)], currentRow, currentColumn, FALSE) &&
+                if (checkIfValid(board, mapArray[MAP_VALUE(i)], currentRow, currentColumn) &&
                     solArray[i] > threshhold) {
                     potentialValues[k] = (float) mapArray[MAP_VALUE(i)];
                     k++;
@@ -419,7 +419,7 @@ void fillMap(sudokoBoard *board, int *mapArray) {
         for (j = 0; j < board->boardSize; j++) {
             if (board->board[i][j].value == 0) {
                 for (v = 1; v <= board->boardSize; v++) {
-                    if (checkIfValid(board, v, i, j, FALSE)) {
+                    if (checkIfValid(board, v, i, j)) {
                         mapArray[MAP_ROW(k)] = i;
                         mapArray[MAP_COLUMN(k)] = j;
                         mapArray[MAP_VALUE(k)] = v;
@@ -468,7 +468,7 @@ void getNumOfVars(sudokoBoard *board, int *pNumOfVars) {
         for (j = 0; j < board->boardSize; j++) {
             if (board->board[i][j].value == 0) {
                 for (v = 1; v <= board->boardSize; v++) {
-                    if (checkIfValid(board, v, i, j, FALSE)) {
+                    if (checkIfValid(board, v, i, j)) {
                         (*pNumOfVars)++;
                     }
                 }
