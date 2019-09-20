@@ -42,8 +42,6 @@ StatusType edit_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, int p
 StatusType mark_errors_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode,
                            int paramNum);
 
-/*prints the board and calls printBoard*/
-StatusType print_board_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, int paramNum);
 
 /*sets value in the board according to the given parameters.
  * 'cmd' return value.
@@ -316,7 +314,6 @@ StatusType solve_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, int 
     destroyBoard(*board);
     destroyList();/*maintain the doublylinkedlist*/
     *board = newBoard;
-    print_board_cmd(paramsArray, board, p_mode, paramNum);
 
     return TRUE;
 }
@@ -341,19 +338,22 @@ StatusType edit_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, int p
 
     *board = newBoard;
 
-    print_board_cmd(paramsArray, board, p_mode, paramNum);
     return TRUE;
 }
 
 StatusType mark_errors_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, int paramNum) {
     int param;
 
+    /*for unused parameters*/
+    UNUSED (paramNum);
+    UNUSED (board);
+    UNUSED (p_mode);
+
     param = atoi(paramsArray[0]);
     if (param == 0 || param == 1) {
         MarkErrors = param;
         return FALSE;
     }
-    print_board_cmd(paramsArray, board, p_mode, paramNum);
     return error_message(incorrect_range, CmdArray[MARK]);
 }
 
@@ -379,6 +379,10 @@ StatusType print_board_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode
 StatusType set_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, int paramNum) {
     int i, j, value, n;
     StatusType status;
+
+    /*for unused parameters*/
+    UNUSED (paramNum);
+
     j = atoi(paramsArray[0]) - 1;/* -1 beacause the user enters in 1 base */
     i = atoi(paramsArray[1]) - 1;
     value = atoi(paramsArray[2]);
@@ -400,7 +404,6 @@ StatusType set_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, int pa
 
     /*Set action itself*/
     (*board)->board[i][j].value = value;
-    print_board_cmd(paramsArray, board, p_mode, paramNum);
 
 
     return TRUE;
@@ -444,6 +447,10 @@ StatusType guess_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, int 
     sudokoBoard *copy;
     float f;
 
+    /*for unused parameters*/
+    UNUSED (paramNum);
+    UNUSED (p_mode);
+
     f = atof(paramsArray[0]);
 
     if (f < 0 || f > 1) {
@@ -463,7 +470,6 @@ StatusType guess_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, int 
     }
     make_board_equal(*board, copy, GUESS);
     destroyBoard(copy);
-    print_board_cmd(paramsArray, board, p_mode, paramNum);
 
 
     return TRUE;
@@ -473,6 +479,10 @@ StatusType generate_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, i
     int x, y;
     sudokoBoard *copy;
     StatusType status;
+
+    /*for unused parameters*/
+    UNUSED (paramNum);
+    UNUSED (p_mode);
 
     x = atoi(paramsArray[0]);
     y = atoi(paramsArray[1]);
@@ -493,13 +503,18 @@ StatusType generate_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, i
     }
     make_board_equal(*board, copy, GENERATE);
     destroyBoard(copy);
-    print_board_cmd(paramsArray, board, p_mode, paramNum);
     return TRUE;
 }
 
 StatusType undo_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, int paramNum) {
     ACTION *action_ptr = NULL;
     CmdType cmd;
+
+    /*for unused parameters*/
+    UNUSED (paramNum);
+    UNUSED (paramsArray);
+    UNUSED (p_mode);
+
     action_ptr = listUndo();
     if (action_ptr == NULL)
         return error_message(no_moves_error, CmdArray[UNDO]);
@@ -521,7 +536,6 @@ StatusType undo_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, int p
             return FALSE;
     }
 
-    print_board_cmd(paramsArray, board, p_mode, paramNum);
     return TRUE;
 }
 
@@ -542,6 +556,12 @@ void do_set_by_action(ACTION action, sudokoBoard *board, int is_undo) {
 StatusType redo_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, int paramNum) {
     ACTION *action_ptr;
     CmdType cmd;
+
+    /*for unused parameters*/
+    UNUSED (paramNum);
+    UNUSED (paramsArray);
+    UNUSED (p_mode);
+
     action_ptr = listRedo();
     if (action_ptr == NULL)
         return error_message(no_moves_error, CmdArray[REDO]);
@@ -569,7 +589,6 @@ StatusType redo_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, int p
         default:
             return FALSE;
     }
-    print_board_cmd(paramsArray, board, p_mode, paramNum);
     return TRUE;
 }
 
@@ -665,7 +684,7 @@ StatusType guess_h_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, in
     }
 
     guessHint(*board, i, j);
-    return TRUE;
+    return FALSE;
 }
 
 StatusType num_s_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, int paramNum) {
@@ -687,6 +706,12 @@ StatusType autofill_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, i
     sudokoBoard *copy;
     int i, j, n, value, firstInsert;
     StatusType *statusArray;
+
+    /*for unused parameters*/
+    UNUSED (paramNum);
+    UNUSED (paramsArray);
+    UNUSED (p_mode);
+
     statusArray = (StatusType *) malloc(sizeof(StatusType) * ((*board)->boardSize));
     n = (*board)->boardSize;
     firstInsert = 1;
@@ -712,7 +737,7 @@ StatusType autofill_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, i
 
     myFree(statusArray);
 
-    print_board_cmd(paramsArray, board, p_mode, paramNum);
+
     return TRUE;
 }
 
@@ -739,12 +764,18 @@ void fill_legal_values(int row, int column, sudokoBoard *board, StatusType *arra
 
 StatusType reset_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, int paramNum) {
     ACTION *action;
+
+    /*for unused parameters*/
+    UNUSED (paramNum);
+    UNUSED (paramsArray);
+    UNUSED (p_mode);
+
     action = listUndo();
     while (action != NULL) {
         do_set_by_action(*action, *board, TRUE);
         action = listUndo();
     }
-    print_board_cmd(paramsArray, board, p_mode, paramNum);
+
     return TRUE;
 }
 
