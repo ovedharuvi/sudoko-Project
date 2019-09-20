@@ -29,8 +29,10 @@ int check_single_solution(StatusType *array, int boardSize);
  * and fills values by the board of the file.*/
 StatusType fill_board(sudokoBoard **boardPtr, char *pString);
 
+/*loads the board x and changes the MODE to SOLVE_MODE.
+ * return value : returns if change in the board has may of happen - TRUE in case of the command succes */
 StatusType solve_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode,
-                     int paramNum);/*loads the board x and changes the MODE to SOLVE_MODE*/
+                     int paramNum);
 StatusType edit_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, int paramNum);
 
 /*change the MODE to EDIT_MODE. in case of path given loads a board (with mark errors) else creates empty 9*9 board (from board.h) */
@@ -89,6 +91,7 @@ int MarkErrors;
 
 void init_game() {
     MarkErrors = TRUE; /*global variable set to TRUE on INIT mode*/
+    SetCmdArray();/* init the CMD Array*/
     printf("Welcome to Sudoku Game !\n To initialize new board you can enter 'edit'.\n"
            "To load a game you can enter 'edit' or 'solve' and then the path of your board.\n");
 
