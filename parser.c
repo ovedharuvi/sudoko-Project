@@ -2,30 +2,34 @@
 
 #include "parser.h"
 
+/* gets the user input. returns FALSE in case of possible errors else TRUE.
+ * possible errors : line limit*/
 StatusType get_line(char *pString);
 
+/* interprets the user command. returns the index of the command using the enum CmdType.
+ * possible errors : invalid command*/
+int get_cmd(char *text, CmdInfo *cmdArray);
+
+/* interprets the user parameters and puts then in the paramsArray. returns FALSE in case of possible errors else TRUE.
+ * possible errors : line limit*/
+int get_params(char *text, char **paramsArray);
+
+/*checks if the number of the parameter is equal to the parameter number of the command using the enum CmdInfo.*/
 StatusType check_param_num(int cmd_index, int num_params_given, CmdInfo *cmdArray);
-
-StatusType check_valid_params(char *paramArray[], CmdInfo cmdInfo);
-
-StatusType do_order(CmdInfo cmdInfo, MODE *p_mode, int paramNum, char *paramsArray[], sudokoBoard **p_board);
-
-StatusType get_cmd(char *text, CmdInfo *cmdArray);
 
 StatusType get_mode(int index, MODE Mode);
 
-int get_params(char *text, char **paramsArray);
+StatusType check_valid_params(char *paramArray[], CmdInfo cmdInfo);
+
+/* execute the order, maintain the doubly linked list and prints the board in case of change in the board had happen.*/
+StatusType do_order(CmdInfo cmdInfo, MODE *p_mode, int paramNum, char *paramsArray[], sudokoBoard **p_board);
+
 
 int
 str_compare(const char *first, char *second);/*returns 0 if the second string is a prefix of the first string, else 1*/
 
 
 
-
-
-
-
-/*void string_to_array(char textPtr[256], char *string, int size);*/
 
 StatusType check_valid_params(char *paramArray[], CmdInfo cmdInfo) {
     int i, t, m;
@@ -36,8 +40,7 @@ StatusType check_valid_params(char *paramArray[], CmdInfo cmdInfo) {
 
 
     for (i = 0; i < param_num; i++) {
-        /* %n returns the number of bytes consumed by sscanf, so if cast to int of strlen equal to n
-         * it means that there no bytes left after %d */
+
         if ((sscanf(paramArray[i], "%d%c", &t, &n) == 1) && (sscanf(paramArray[i], "%d", &t) == 1)) {
             paramType = Integer;
 
@@ -93,7 +96,7 @@ StatusType get_line(
 }
 
 
-StatusType get_cmd(char *text, CmdInfo *cmdArray) {
+int get_cmd(char *text, CmdInfo *cmdArray) {
     int i;
     char *pcommand;
     char delimit[] = " \t\r\n\v\f";

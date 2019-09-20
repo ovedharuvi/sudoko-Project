@@ -11,7 +11,9 @@
 
 
 
-
+/* The CmdInfo and CmdType helps to have generic validations of the commands.
+ * The Enums are coordinated in their index:
+ * The cmdArray initialize to have each cmdInfo of each command in the same range of the cmdType Enum.*/
 
 typedef enum{
     INIT_MODE = 1,EDIT_MODE = 2,SOLVE_MODE = 3

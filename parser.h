@@ -9,9 +9,14 @@
 
 /* -----Documentation of public Functions---------------------------------
 The flow in the function 'order' is to get the user input, interpret it and process it.
-In case of an error - break the flow.
- * -----------------------------------------------------------------------*/
+ Each function in this flow returns StatusType : FALSE if failed else TRUE.
+In case of an error - the flow breaks.
+order return value is StatusType: TRUE if the game is solved  successfully, FALSE otherwise, EXIT to finish the program.
+
+ Using CmdInfo and CmdType Enums gives the parser the option to do generic checks. */
+
+ /*-----------------------------------------------------------------------*/
 StatusType order(sudokoBoard **board_ptr, MODE *p_mode);
-/* returns TRUE if the game is solved  successfully, FALSE otherwise, EXIT to finish the program*/
+
 
 #endif
