@@ -181,7 +181,8 @@ sudokoBoard *load(char *path) {
     if (status == FALSE)
         return NULL;
 
-    free(buffer);
+        free(buffer);
+
 
     return board_ptr;
 }
@@ -228,7 +229,7 @@ StatusType fill_board(sudokoBoard **boardPtr, char *pString) {
             status = sscanf(ptoken, "%d%c", &value, &dot);
             if (status > 0) {
                 newBoard->board[i][j].value = value;
-                maintain_erroneous(i, j, value, *boardPtr);
+                maintain_erroneous(i, j, value,newBoard);
                 result++;
                 if (status == 2) {
                     newBoard->board[i][j].is_fixed = TRUE;
@@ -677,8 +678,12 @@ StatusType is_game_over(sudokoBoard *board_ptr) {
                 }
             }
         }
-        destroyBoard(copy);
-        free(statusArray);
+        if (copy) {
+            destroyBoard(copy);
+        }
+        if (statusArray) {
+            free(statusArray);
+        }
         print_board_cmd(paramsArray, board, p_mode, paramNum);
         return TRUE;
     }
