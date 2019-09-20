@@ -169,8 +169,16 @@ int get_params(char *text, char **paramsArray) {
 StatusType do_order(CmdInfo cmdInfo, MODE *p_mode, int paramNum, char **paramsArray, sudokoBoard **p_board) {
     StatusType status;
 
-   cmdInfo.fun_ptr(paramsArray, p_board, p_mode, paramNum);
-    status = check_game_over(*p_mode, *p_board,cmdInfo );
+   status = cmdInfo.fun_ptr(paramsArray, p_board, p_mode, paramNum);
+   if (status != TRUE){
+       return status;
+   }
+
+    /* updates that game is over only in solve mode*/
+    if (*p_mode != SOLVE_MODE) {
+        return FALSE;
+    }
+    status = check_game_over(*p_board, cmdInfo);
     return status;
 }
 

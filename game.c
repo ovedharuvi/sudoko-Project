@@ -272,7 +272,7 @@ StatusType solve_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, int 
     *board = newBoard;
     print_board_cmd(paramsArray, board, p_mode, paramNum);
 
-    return FALSE;
+    return TRUE;
 }
 
 StatusType edit_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, int paramNum) {
@@ -297,7 +297,7 @@ StatusType edit_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, int p
     *board = newBoard;
 
     print_board_cmd(paramsArray, board, p_mode, paramNum);
-    return FALSE;
+    return TRUE;
 }
 
 StatusType mark_errors_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, int paramNum) {
@@ -362,15 +362,11 @@ StatusType set_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, int pa
     /*checks if game over in SOLVE MODE*/
 
 
-    return status;
+    return TRUE;
 }
 
-StatusType check_game_over(MODE mode, sudokoBoard *board, CmdInfo cmdInfo) {
+StatusType check_game_over(sudokoBoard *board, CmdInfo cmdInfo) {
     StatusType status;
-    /* updates that game is over only in solve mode*/
-    if (mode != SOLVE_MODE) {
-        return FALSE;
-    }
 
     status = is_game_over(board);
 
@@ -381,6 +377,7 @@ StatusType check_game_over(MODE mode, sudokoBoard *board, CmdInfo cmdInfo) {
     if (is_erroneous(board)) {
         return error_message(board_erroneous, cmdInfo);/*return error of erroneous*/
     } else {
+        printf("Congratulations !!! You solved the board! \n");
         exit_game(board, FALSE);/*Free everything and not exiting program*/
 
     }
@@ -433,7 +430,7 @@ StatusType guess_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, int 
     print_board_cmd(paramsArray, board, p_mode, paramNum);
 
 
-    return FALSE;
+    return TRUE;
 }
 
 StatusType generate_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, int paramNum) {
@@ -459,7 +456,7 @@ StatusType generate_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, i
     make_board_equal(*board, copy, GENERATE);
     destroyBoard(copy);
     print_board_cmd(paramsArray, board, p_mode, paramNum);
-    return FALSE;
+    return TRUE;
 }
 
 StatusType undo_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, int paramNum) {
@@ -487,7 +484,7 @@ StatusType undo_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, int p
     }
 
     print_board_cmd(paramsArray, board, p_mode, paramNum);
-    return FALSE;
+    return TRUE;
 }
 
 void do_set_by_action(ACTION action, sudokoBoard *board, int is_undo) {
@@ -528,7 +525,7 @@ StatusType redo_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, int p
             return FALSE;
     }
     print_board_cmd(paramsArray, board, p_mode, paramNum);
-    return FALSE;
+    return TRUE;
 }
 
 StatusType save_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, int paramNum) {
@@ -623,7 +620,7 @@ StatusType guess_h_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, in
     }
 
     guessHint(*board, i, j);
-    return FALSE;
+    return TRUE;
 }
 
 StatusType num_s_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, int paramNum) {
@@ -667,7 +664,7 @@ StatusType autofill_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, i
     destroyBoard(copy);
     free(statusArray);
     print_board_cmd(paramsArray, board, p_mode, paramNum);
-    return FALSE;
+    return TRUE;
 }
 
 int check_single_solution(StatusType *array, int boardSize) {
@@ -699,7 +696,7 @@ StatusType reset_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, int 
         action = listUndo();
     }
     print_board_cmd(paramsArray, board, p_mode, paramNum);
-    return FALSE;
+    return TRUE;
 }
 
 
