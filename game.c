@@ -695,7 +695,7 @@ StatusType guess_h_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, in
 }
 
 StatusType num_s_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, int paramNum) {
-    int result;
+    int result=0;
 
     /*for unused parameters*/
     UNUSED (paramNum);
