@@ -77,7 +77,7 @@ int gurobi(sudokoBoard *sudokoBoard, float threshold, CmdType command, int guess
     /*Allocating mamory*/
     obj = (double *) malloc(sizeof(double) * numOfVars);
     vtype = (char *) malloc(sizeof(char) * numOfVars);
-    map = (int *) malloc(3 * sizeof(int) * numOfVars);
+    map = (int *) malloc(3 * sizeof(int) * numOfVars); /*Mapping the varibles --- each variable mapped to 3 cells (row,column,value)*/
     sol = (double *) malloc(sizeof(double) * numOfVars);
     ind = (int *) malloc(sizeof(int) * boardSize);
     val = (double *) malloc(sizeof(double) * boardSize);
@@ -100,7 +100,7 @@ int gurobi(sudokoBoard *sudokoBoard, float threshold, CmdType command, int guess
 
 
     error = GRBsetintparam(env, GRB_INT_PAR_LOGTOCONSOLE, 0);
-    error |= GRBsetintparam(env, GRB_INT_PAR_OUTPUTFLAG, 0);
+    error =  error || GRBsetintparam(env, GRB_INT_PAR_OUTPUTFLAG, 0);
     if (error) {
 #ifdef DEBUG
         printf("ERROR %d GRBsetintattr(): %s\n", error, GRBgeterrormsg(env));

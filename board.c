@@ -68,13 +68,15 @@ sudokoBoard *copyBoard(sudokoBoard *board) {
 
 void destroyBoard(sudokoBoard *board) {
     int boardSize, i;
-    boardSize = board->boardSize;
+    if(board != NULL){
+        boardSize = board->boardSize;
 
-    for (i = 0; i < boardSize; ++i) {
-        free(board->board[i]);
+        for (i = 0; i < boardSize; ++i) {
+            free(board->board[i]);
+        }
+        free(board->board);
+        free(board);
     }
-    free(board->board);
-    free(board);
 }
 
 
