@@ -22,8 +22,8 @@ int MarkErrors;
 void init_game() {
     MarkErrors = TRUE; /*global variable set to TRUE on INIT mode*/
     SetCmdArray();/* init the CMD Array*/
-    printf("Welcome to Sudoku Game ! To initialize new board you can enter 'edit'.\n"
-           "To load a game you can enter 'edit' or 'solve' and then the path of your board.");
+    printf("Welcome to Sudoku Game !\n To initialize new board you can enter 'edit'.\n"
+           "To load a game you can enter 'edit' or 'solve' and then the path of your board.\n");
 
 }
 
@@ -378,7 +378,7 @@ StatusType generate_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, i
     x = atoi(paramsArray[0]);
     y = atoi(paramsArray[1]);
     status = isEmptySmallerThanLegalVal(*board, x);
-    if (status == FALSE) {
+    if (status == TRUE) {
         return error_message(incorrect_range, CmdArray[GENERATE]);
     }
 
@@ -661,7 +661,7 @@ void exit_game(sudokoBoard *board_ptr, int is_exit_program) {
         destroyBoard(board_ptr);
     }
     if (is_exit_program == TRUE) {
-        printf("Exiting...");
+        printf("Exiting...\n");
     }
 
 }
