@@ -25,7 +25,8 @@ void fill_legal_values(int row, int column, sudokoBoard *board, StatusType *arra
 int check_single_solution(StatusType *array, int boardSize);
 
 /* fill_board is a function inside load function.
- * according to the file format parameters fill_board creates new sudokoBoard */
+ * according to the file format parameters fill_board creates new sudokoBoard and assign in to the the parameter
+ * and fills values by the board of the file.*/
 StatusType fill_board(sudokoBoard **boardPtr, char *pString);
 
 StatusType solve_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode,
@@ -510,9 +511,10 @@ StatusType redo_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, int p
         case AUTOFILL:
         case GUESS:
             do_set_by_action(*action_ptr, *board, FALSE);
+            action_ptr = listRedo();
             while (action_ptr->insertedByComputer == TRUE) {
-                action_ptr = listRedo();
                 do_set_by_action(*action_ptr, *board, FALSE);
+                action_ptr = listRedo();
             }
             break;
         case SET:
