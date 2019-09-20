@@ -40,7 +40,7 @@ void SetTableInfo(CmdType cmdtype,
 
 void SetCmdArray() {
     SetTableInfo(SOLVE, &solve_cmd, INIT_MODE + EDIT_MODE + SOLVE_MODE, 1, String, "solve");
-    SetTableInfo(EDIT, &edit_cmd, INIT_MODE + EDIT_MODE + SOLVE_MODE, 1, String + None, "edit");
+    SetTableInfo(EDIT, &edit_cmd, INIT_MODE + EDIT_MODE + SOLVE_MODE, 1, String, "edit");
     SetTableInfo(MARK, &mark_errors_cmd, SOLVE_MODE, 1, Integer, "mark_errors");
     SetTableInfo(PRINT, &print_board_cmd, EDIT_MODE + SOLVE_MODE, 0, None, "print_board");
     SetTableInfo(SET, &set_cmd, EDIT_MODE + SOLVE_MODE, 3, Integer, "set");
@@ -249,16 +249,12 @@ StatusType edit_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, int p
 StatusType mark_errors_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, int paramNum) {
     int param;
 
-    /*for unused parameters*/
-    UNUSED (paramNum);
-    UNUSED (p_mode);
-    UNUSED(board);
-
     param = atoi(paramsArray[0]);
     if (param == 0 || param == 1) {
         MarkErrors = param;
         return FALSE;
     }
+    print_board_cmd(paramsArray, board, p_mode, paramNum);
     return error_message(incorrect_range, CmdArray[MARK]);
 }
 
@@ -511,6 +507,7 @@ StatusType save_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, int p
 
     }
     fclose(file_ptr);
+    printf("Board saved to :%s",path);
 
     return FALSE;
 }
@@ -631,6 +628,7 @@ StatusType reset_cmd(char **paramsArray, sudokoBoard **board, MODE *p_mode, int 
     action = listUndo();
     while (action != NULL) {
         do_set_by_action(*action, *board, TRUE);
+        action = listUndo();
     }
     print_board_cmd(paramsArray, board, p_mode, paramNum);
     return FALSE;
@@ -658,8 +656,10 @@ StatusType check_range(int row, int column, int value, int size) {
 }
 
 void exit_game(sudokoBoard *board_ptr, int is_exit_program) {
-    destroyList();
-    destroyBoard(board_ptr);
+    if (board_ptr != NULL) {
+        destroyList();
+        destroyBoard(board_ptr);
+    }
     if (is_exit_program == TRUE) {
         printf("Exiting...");
     }
