@@ -1,7 +1,7 @@
 
-#include <stdio.h>
-#include <stdlib.h>
+#endif //SUDOKOPROJECT_SOLVER_H
 #include "stack.h"
+#include "errors.h"
 #include "LP.h"
 #ifndef SUDOKOPROJECT_SOLVER_H
 #define SUDOKOPROJECT_SOLVER_H
